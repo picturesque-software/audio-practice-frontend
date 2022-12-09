@@ -6,7 +6,7 @@
         <!--        <router-view></router-view>-->
         <h1>很好！你已完成第一阶段的听音</h1>
 
-        <p >接下来，您只需要专注于音频的纵深定位比较，让我们继续愉快旅程吧！</p>
+        <p >接下来，您只需要专注于音频的纵深定位比较，让我们进入第二阶段，继续愉快旅程吧！</p>
         <img src="../assets/home.gif" alt class="gif" />
         <!-- 内容区域 -->
         <!-- <img src="../assets/src=http___p4.itc.cn_q_70_images01_20210506_628477c0733b44ac898ed640b2e473c1.jpeg&refer=http___p4.itc.webp" alt class="tupian-img" /> -->
@@ -36,11 +36,12 @@ export default {
                     let audioPairList = data.data
                     this.$storage.set('audioPairList', audioPairList)
                     console.log(this.$storage.getObj('audioPairList'))
-                    this.$storage.set('winArrayOfStep2',[1,4,5,2,78])
                     // step
                     this.$storage.set('stepActive',1)
-                    // 第几次评测
-                    this.$storage.set('stageOfStep',1)
+                    let stages = this.$storage.getObj('stages')
+                    for(let i=1;i<stages.length;i++) stages[i] = 0
+                    this.$storage.set('stages', stages)
+
                     let result=JSON.parse(JSON.stringify([]))
                     console.log(result)
                     for(let i=0;i<audioPairList.length;i++){
@@ -48,16 +49,13 @@ export default {
                         result.push({})
                     }
                     this.$storage.set('resultOfStep1',result)
+
                     this.$router.push({path:'stepsRoot/audioCompareWithoutSoundQuality'})
                 } else {
                     this.$message.error(data.msg);
                 }
             });
-            // this.$storage.set('stageOfStep',1)
-            // this.$storage.set('winArrayOfStep2',[1,4,5,2,78])
-            //
-            // this.$storage.set('stepActive',1)
-            // this.$router.push({path:'stepsRoot/audioCompareWithoutSoundQuality'})
+
         }
     },
 };

@@ -1,25 +1,29 @@
 <template>
     <div>
-<!--        <div>-->
-            <div>
-                <el-button style="float: left" v-if="!isLoop" @click="clickLoop" icon="el-icon-close" >LOOP</el-button>
-                <el-button style="float: left" v-if="isLoop" @click="clickLoop" icon="el-icon-check" >LOOP</el-button>
-                <span style="float: right">当前播放：{{this.currentAudio==='audio1'?'音频A':'音频B'}}</span>
-            </div>
-            <div style="width: 100%; height:4em;display: flex">
-                <el-button style="margin: auto" size="big" v-if="!isPlaying" @click="play" type="primary" icon="el-icon-video-play">播放</el-button>
-                <el-button style="margin: auto" v-if="isPlaying" @click="play" type="primary" icon="el-icon-video-pause">暂停</el-button>
-            </div>
-            <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="audio1" :src="myAudios[0].url"></audio>
-            <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="audio2" :src="myAudios[1].url"></audio>
-<!--        </div>-->
+        <div style="float:left">
+            <span style="margin-right: 0.5em">LOOP</span>
+            <el-switch v-model="isLoop"></el-switch>
+        </div>
+        <div style="width: 100%; height:4em;display: flex">
+            <el-button style="margin: auto" size="big" v-if="!isPlaying" @click="play" type="primary"
+                       icon="el-icon-video-play">播放
+            </el-button>
+            <el-button style="margin: auto" v-if="isPlaying" @click="play" type="primary" icon="el-icon-video-pause">
+                暂停
+            </el-button>
+        </div>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="myAudios[0].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="myAudios[1].url"></audio>
+        <!--        </div>-->
 
         <div style="display: flex;margin-top: 1em">
             <div style="width: 10%; color: #e74c3c">前</div>
-            <draggable style="width: 80%" @end="onEnd" v-model="myAudios" chosen-class="chosen" force-fallback="true" fallbackTolerance="3" group="material" animation="1000">
+            <draggable style="width: 80%" @end="onEnd" v-model="myAudios" chosen-class="chosen" force-fallback="true"
+                       fallbackTolerance="3" group="material" animation="1000">
                 <transition-group style="height: 7em; display: flex">
                     <template v-for="(element, index) in myAudios">
-                        <drag-item @itemClick="clickAudio(index)" class="item" :key="element.name" :index="index" :audio="element">
+                        <drag-item @itemClick="clickAudio(element)" :class="currentAudio === element.formName ? 'activeItem':'item'" :key="element.name" :index="index"
+                                   :audio="element">
                         </drag-item>
                     </template>
                 </transition-group>
@@ -32,29 +36,30 @@
 <script>
 import draggable from 'vuedraggable'
 import dragItem from './DragItem'
+
 export default {
-    components:{draggable, dragItem},
+    components: {draggable, dragItem},
     name: "TwoAudio",
-    props:{
-        audioList:{
-            type:Array,
-            default:() => []
+    props: {
+        audios: {
+            type: Array,
+            default: () => []
         },
     },
-    data(){
-        return{
-            myAudios: this.audioList,
+    data() {
+        return {
+            myAudios: this.audios,
 
-            isPlaying:false,
+            isPlaying: false,
 
-            audioRefs:['audio1','audio2'],
+            audioRefs: ['音频A', '音频B'],
 
-            currentAudio:'audio1',
+            currentAudio: '音频A',
 
-            isMutedAudio1:true,
-            isMutedAudio2:false,
+            isMutedAudio1: true,
+            isMutedAudio2: false,
 
-            isLoop:true,
+            isLoop: true,
 
 
         }
@@ -62,49 +67,48 @@ export default {
     mounted() {
         console.log(this.myAudios)
     },
-    methods:{
-        play(){
-            if(this.$refs.audio1.paused && this.$refs.audio2.paused){
-                for(let i=0;i<this.audioRefs.length;i++){
-                    if(this.audioRefs[i]===this.currentAudio) continue
-                    this.$refs[this.audioRefs[i]].muted=true
+    methods: {
+        play() {
+            if (this.$refs['音频A'].paused && this.$refs['音频B'].paused) {
+                for (let i = 0; i < this.audioRefs.length; i++) {
+                    if (this.audioRefs[i] === this.currentAudio) continue
+                    this.$refs[this.audioRefs[i]].muted = true
                 }
 
-                this.$refs.audio1.play()
-                this.$refs.audio2.play()
+                this.$refs['音频A'].play()
+                this.$refs['音频B'].play()
 
-                this.isPlaying=true
-            }else{
-                this.$refs.audio1.pause()
-                this.$refs.audio2.pause()
+                this.isPlaying = true
+            } else {
+                this.$refs['音频A'].pause()
+                this.$refs['音频B'].pause()
 
-                this.isPlaying=false
+                this.isPlaying = false
             }
         },
-        clickAudio(index){
-            console.log(index)
-            if(index===0){
-                this.$refs.audio1.muted=false
-                this.$refs.audio2.muted=true
-                this.currentAudio="audio1"
-            }else{
-                this.$refs.audio1.muted=true
-                this.$refs.audio2.muted=false
-                this.currentAudio="audio2"
+        clickAudio(element) {
+            if (element.formName==='音频A') {
+                this.$refs['音频A'].muted = false
+                this.$refs['音频B'].muted = true
+                this.currentAudio = "音频A"
+            } else {
+                this.$refs['音频A'].muted = true
+                this.$refs['音频B'].muted = false
+                this.currentAudio = "音频B"
             }
-            this.$emit("onChildClick", this.myAudios[index].formName)
+            this.$emit("onChildClick", element.formName)
         },
-        clickLoop(){
-            this.isLoop=!this.isLoop
+        clickLoop() {
+            this.isLoop = !this.isLoop
         },
-        onEnd(){
-            let value=this.myAudios
+        onEnd() {
+            let value = this.myAudios
             console.log(value)
             this.$emit("update", value)
         },
-        overPlay(){
-            if(!this.isLoop){
-                this.isPlaying=false
+        overPlay() {
+            if (!this.isLoop) {
+                this.isPlaying = false
             }
         }
     }
@@ -128,9 +132,28 @@ export default {
     cursor: move;
 }
 
+.activeItem{
+    width: 40%;
+    height: 100%;
+    padding: 6px;
+    display: flex;
+    background-color: rgba(133, 190, 245, 0.99);
+    border: solid 2px #989595;
+    margin: auto;
+    cursor: move;
+}
+
 .chosen {
     border: solid 2px #409EFF !important;
 }
-*{ user-select:none; -webkit-user-select:none; }
-input,textarea{ user-select:text; -webkit-user-select:text; }
+
+* {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
+}
 </style>

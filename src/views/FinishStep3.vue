@@ -6,7 +6,7 @@
         <!--        <router-view></router-view>-->
         <h1>nice！你已完成第三阶段的听音！</h1>
 
-        <p>接下来，您需要进一步专注于音频的纵深定位比较，让我们继续愉快旅程吧！</p>
+        <p>接下来，您需要进一步专注于音频的纵深定位比较，让我们进入第四阶段，继续愉快旅程吧！</p>
         <img src="../assets/home.gif" alt class="gif" />
         <!-- 内容区域 -->
         <!-- <img src="../assets/src=http___p4.itc.cn_q_70_images01_20210506_628477c0733b44ac898ed640b2e473c1.jpeg&refer=http___p4.itc.webp" alt class="tupian-img" /> -->
@@ -25,10 +25,29 @@ export default {
     },
     methods: {
         enter(){
-            this.$storage.set('stageOfStep',1)
-            this.$storage.set('winArrayOfStep2',[1,4,5,2,78])
-            this.$storage.set('stepActive',3)
-            this.$router.push({path:'stepsRoot/audioCompareWithoutSoundQuality'})
+            let params={}
+            params.uid=this.$storage.get('userid')
+            this.$http({
+                url: this.$api.getAudiosStep4,
+                method: "get",
+                params: params
+            }).then(({data}) => {
+                if (data && data.code === "0") {
+                    let audioPairList = data.data
+                    this.$storage.set('audioPairList', audioPairList)
+                    console.log(this.$storage.getObj('audioPairList'))
+                    // step
+                    this.$storage.set('stepActive',3)
+                    // 这里刷新一下，防止回退
+                    let stages = this.$storage.getObj('stages')
+                    for(let i=3;i<stages.length;i++) stages[i] = 0
+                    this.$storage.set('stages', stages)
+
+                    this.$router.push({path:'stepsRoot/audioCompareWithoutSoundQuality'})
+                } else {
+                    this.$message.error(data.msg);
+                }
+            });
         }
     },
 };

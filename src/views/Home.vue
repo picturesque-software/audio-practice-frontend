@@ -56,9 +56,6 @@ export default {
             this.$router.push({path:'/register'})
         },
         login(){
-            // this.$storage.set('stageOfStep',1)
-            // this.$storage.set('winArrayOfStep2',[1,4,5,2,78])
-            // this.$storage.set('stepActive',0)
             this.$refs["ruleForm"].validate(valid => {
                 if (valid) {
                     this.$http({
@@ -78,7 +75,7 @@ export default {
                             // TODO 权限
                             //             this.$storage.set("sessionTable", this.tableName);
                             this.$storage.set("username", this.ruleForm.username);
-                            this.$storage.set("userid", data.data.id);
+                            this.$storage.set("userid", data.data.uid);
                             this.$router.push({path:'/welcome'})
                         } else {
                             this.$message.error(data.msg);

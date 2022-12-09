@@ -4,8 +4,8 @@ const http = axios.create({
     timeout: 1000 * 86400,
     withCredentials: true,
     // TODO 对接后端接口处
-    baseURL: " https://mock.presstime.cn/mock/637c3a55b358b9006b3e403b/audio",
-    // baseURL: "/audio",
+    // baseURL: " https://mock.presstime.cn/mock/637c3a55b358b9006b3e403b/audio",
+    baseURL: "/audio",
     headers: {
         'Content-Type': 'application/json; charset=utf-8'
     }

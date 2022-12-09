@@ -1,27 +1,32 @@
 <template>
     <div>
-<!--        <div>-->
-            <div style="float:left">
-                <span style="margin-right: 0.5em">LOOP</span><el-switch v-model="isLoop"></el-switch>
-<!--                <span style="float: right">当前播放：{{this.currentAudio==='referAudio'?'参考音频':(this.currentAudio==='audio1'?'音频A':'音频B')}}</span>-->
-            </div>
+        <div style="float:left">
+            <span style="margin-right: 0.5em">LOOP</span>
+            <el-switch v-model="isLoop"></el-switch>
+        </div>
 
-            <div style="width: 100%; height:4em;display: flex">
-                <el-button style="margin: auto" size="big" v-if="!isPlaying" @click="play" type="primary" icon="el-icon-video-play">播放</el-button>
-                <el-button style="margin: auto" v-if="isPlaying" @click="play" type="primary" icon="el-icon-video-pause">暂停</el-button>
-            </div>
-            <audio @ended="overPlay" :loop="isLoop" :muted="isMutedRefer" ref="referAudio" :src="myAudios[0].url"></audio>
-            <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="audio1" :src="myAudios[1].url"></audio>
-            <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="audio2" :src="myAudios[2].url"></audio>
-            <el-button @click="clickRefer">参考音频</el-button>
-<!--        </div>-->
+        <div style="width: 100%; height:4em;display: flex">
+            <el-button style="margin: auto" size="big" v-if="!isPlaying" @click="play" type="primary"
+                       icon="el-icon-video-play">播放
+            </el-button>
+            <el-button style="margin: auto" v-if="isPlaying" @click="play" type="primary" icon="el-icon-video-pause">
+                暂停
+            </el-button>
+        </div>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedRefer" ref="参考音频" :src="audioList[0].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="audioList[1].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="audioList[2].url"></audio>
+<!--        <el-button @click="clickRefer">参考音频</el-button>-->
+        <!--        </div>-->
 
         <div style="display: flex;margin-top: 1em">
             <div style="width: 10%; color: #e74c3c">前</div>
-            <draggable style="width: 80%" @end="onEnd" v-model="myAudios" chosen-class="chosen" force-fallback="true" fallbackTolerance="3" group="material" animation="1000">
-                <transition-group style="height: 7em; display: flex">
+            <draggable style="width: 80%;height: 6em" @end="onEnd" v-model="myAudios" chosen-class="chosen" force-fallback="true"
+                       fallbackTolerance="3" group="material" animation="1000">
+                <transition-group style="height: 100%; display: flex">
                     <template v-for="(element, index) in myAudios">
-                        <drag-item @itemClick="clickAudio(element)" class="item" :key="element.name" :index="index" :audio="element">
+                        <drag-item @itemClick="clickAudio(element)" :class="currentAudio === element.formName ? 'activeItem':'item'" :key="element.formName" :index="index"
+                                   :audio="element">
                         </drag-item>
                     </template>
                 </transition-group>
@@ -34,31 +39,60 @@
 <script>
 import draggable from 'vuedraggable'
 import dragItem from './DragItem'
-export default {
-    components:{draggable, dragItem},
-    name: "ThreeAudio",
-    props:{
 
-        audioList:{
-            type:Array,
-            default:() => []
+export default {
+    components: {draggable, dragItem},
+    name: "ThreeAudio",
+    props: {
+
+        audioList: {
+            type: Array,
+            default: () => [
+                {
+                    "id": 17,
+                    "name": "参考音频",
+                    "formName": "参考音频",
+                    "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B02k-3.5k.wav",
+                    "processMode": 0,
+                    "algorithm": 0,
+                    "material": 1
+                },
+                {
+                    "id": 1,
+                    "name": "音频1",
+                    "formName": "音频A",
+                    "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_back1__L.wav",
+                    "processMode": 1,
+                    "algorithm": 1,
+                    "material": 1
+                },
+                {
+                    "id": 9,
+                    "name": "音频9",
+                    "formName":"音频B",
+                    "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_back9__L.wav",
+                    "processMode": 1,
+                    "algorithm": 9,
+                    "material": 1
+                }
+            ]
         },
     },
-    data(){
-        return{
+    data() {
+        return {
             myAudios: this.audioList,
 
-            isPlaying:false,
+            isPlaying: false,
 
-            audioRefs:['referAudio','audio1','audio2'],
+            audioRefs: ['参考音频', '音频A', '音频B'],
 
-            currentAudio:'referAudio',
+            currentAudio: '参考音频',
 
-            isMutedRefer:true,
-            isMutedAudio1:true,
-            isMutedAudio2:false,
+            isMutedRefer: true,
+            isMutedAudio1: true,
+            isMutedAudio2: false,
 
-            isLoop:true,
+            isLoop: true,
 
 
         }
@@ -66,60 +100,57 @@ export default {
     mounted() {
 
     },
-    methods:{
-        play(){
-            if(this.$refs.audio1.paused && this.$refs.audio2.paused && this.$refs.referAudio.paused){
-                for(let i=0;i<this.audioRefs.length;i++){
-                    if(this.audioRefs[i]===this.currentAudio) continue
-                    this.$refs[this.audioRefs[i]].muted=true
+    methods: {
+        play() {
+            if (this.$refs['音频A'].paused && this.$refs['音频B'].paused && this.$refs['参考音频'].paused) {
+                for (let i = 0; i < this.audioRefs.length; i++) {
+                    if (this.audioRefs[i] === this.currentAudio) continue
+                    this.$refs[this.audioRefs[i]].muted = true
                 }
 
-                this.$refs.audio1.play()
-                this.$refs.audio2.play()
-                this.$refs.referAudio.play()
+                this.$refs['音频A'].play()
+                this.$refs['音频B'].play()
+                this.$refs['参考音频'].play()
 
-                this.isPlaying=true
-            }else{
-                this.$refs.audio1.pause()
-                this.$refs.audio2.pause()
-                this.$refs.referAudio.pause()
+                this.isPlaying = true
+            } else {
+                this.$refs['音频A'].pause()
+                this.$refs['音频B'].pause()
+                this.$refs['参考音频'].pause()
 
-                this.isPlaying=false
+                this.isPlaying = false
             }
         },
-        clickAudio(element){
-            console.log(index)
-            if(index===0){
-                this.$refs.audio1.muted=false
-                this.$refs.audio2.muted=true
-                this.$refs.referAudio.muted=true
-                this.currentAudio="audio1"
-            }else{
-                this.$refs.audio1.muted=true
-                this.$refs.audio2.muted=false
-                this.$refs.referAudio.muted=true
-                this.currentAudio="audio2"
+        clickAudio(element) {
+            console.log(element)
+            if (element.formName === "参考音频") {
+                this.$refs['音频A'].muted = true
+                this.$refs['音频B'].muted = true
+                this.$refs['参考音频'].muted = false
+            } else if(element.formName === "音频A"){
+                this.$refs['音频A'].muted = false
+                this.$refs['音频B'].muted = true
+                this.$refs['参考音频'].muted = true
+            } else if(element.formName === "音频B"){
+                this.$refs['音频A'].muted = true
+                this.$refs['音频B'].muted = false
+                this.$refs['参考音频'].muted = true
             }
-            this.$emit("onChildClick", this.myAudios[index].formName)
+            this.currentAudio = element.formName
+            this.$emit("onChildClick", element.formName)
         },
-        clickRefer(){
-            this.$refs.audio1.muted=true
-            this.$refs.audio2.muted=true
-            this.$refs.referAudio.muted=false
-            this.currentAudio="referAudio"
-        },
-        clickLoop(){
-            this.isLoop=!this.isLoop
+        clickLoop() {
+            this.isLoop = !this.isLoop
         },
         // end drag
-        onEnd(){
-            let value=this.myAudios
+        onEnd() {
+            let value = this.myAudios
             console.log(value)
             this.$emit("onChildUpdate", value)
         },
-        overPlay(){
-            if(!this.isLoop){
-                this.isPlaying=false
+        overPlay() {
+            if (!this.isLoop) {
+                this.isPlaying = false
             }
         }
     }
@@ -142,7 +173,16 @@ export default {
     background-color: #d3d1d1;
     cursor: move;
 }
-
+.activeItem{
+    width: 40%;
+    height: 100%;
+    padding: 6px;
+    display: flex;
+    background-color: rgba(133, 190, 245, 0.99);
+    border: solid 2px #989595;
+    margin: auto;
+    cursor: move;
+}
 .chosen {
     border: solid 2px #409EFF !important;
 }

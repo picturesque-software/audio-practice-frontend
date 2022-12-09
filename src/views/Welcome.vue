@@ -15,23 +15,6 @@
             <el-button type="primary" @click="restart">重新开始</el-button>
         </div>
 
-<!--        &lt;!&ndash; 内容区域 &ndash;&gt;-->
-<!--         <img src="../assets/src=http___p4.itc.cn_q_70_images01_20210506_628477c0733b44ac898ed640b2e473c1.jpeg&refer=http___p4.itc.webp" alt class="tupian-img" /> -->
-<!--        <div style="margin: 3em">-->
-<!--            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="auto" :label-position="labelPosition" size="mini">-->
-<!--                <el-form-item label="用户名" prop="username" class="white-label-item">-->
-<!--                    <el-input type="text" v-model="ruleForm.username"></el-input>-->
-<!--                </el-form-item>-->
-<!--                <el-form-item label="密码" prop="password" class="white-label-item">-->
-<!--                    <el-input type="password" v-model="ruleForm.password"></el-input>-->
-<!--                </el-form-item>-->
-<!--                <el-button style="display: block; color: white; font-weight: bold" type="text" @click="register">注册</el-button>-->
-<!--                &lt;!&ndash;                <el-button style="" type="text" @click="findPassword()">找回密码</el-button>&ndash;&gt;-->
-<!--                <el-button type="primary" @click="enter">登录</el-button>-->
-
-<!--            </el-form>-->
-<!--        </div>-->
-
     </div>
 </template>
 
@@ -39,7 +22,8 @@
 export default {
     data() {
         return {
-            hasRecord:''
+            hasRecord:'',
+            step:''
         };
     },
     created() {},
@@ -53,6 +37,7 @@ export default {
             params: params
         }).then(({data}) => {
             if (data && data.code === "0") {
+                this.step = data.data.step
                 this.hasRecord = data.data.step !== 0
             } else {
                 this.$message.error(data.msg);
@@ -62,7 +47,7 @@ export default {
     },
     methods: {
         goLast(){
-            // this.$router.push({path:'/register'})
+            this.$router.push({path:'/finishStep'+this.step.toString()})
         },
         restart(){
 
@@ -79,8 +64,6 @@ export default {
                     this.$storage.set('stages',[0,0,0,0,0])
                     // step
                     this.$storage.set('stepActive',0)
-                    // 第几次评测
-                    this.$storage.set('stageOfStep',1)
                     let result=JSON.parse(JSON.stringify([]))
                     console.log(result)
                     for(let i=0;i<audioPairList.length;i++){

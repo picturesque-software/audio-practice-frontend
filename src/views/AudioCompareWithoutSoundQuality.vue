@@ -3,7 +3,7 @@
         <p>评测流程：点击播放，默认播放<span style="color:red">音频A</span>。</p>
         <p>点击待评测音频AB方块以切换听音，并拖动方块对音频AB进行排序。<span style="color:red">注意前后~</span></p>
         <two-audio
-            :audioList="audios.audioList"
+            :audios="audios"
             @update="update"
         ></two-audio>
 
@@ -17,44 +17,46 @@ import twoAudio from "../components/audio/TwoAudio.vue";
 
 export default {
     components: {twoAudio},
-    inject:['reload'],
+    inject: ['reload'],
 
     data() {
         return {
-
+            step: '',
             stage: '',
-
-            constAudioList: [],
-            audios: {
-                audioList: [
-                    {
-                        id: 1,
-                        name: '',
-                        url: '',
-                    },
-                    {
-                        id: 1,
-                        name: '',
-                        url: '',
-                    },
-                ],
-                referAudio: {
-                    id: 1,
-                    name: '',
-                    url: '',
-                },
-            },
+            audios: []
         }
     },
     created() {
-        this.stage = Number(this.$storage.get('stageOfStep'))
+        let step = Number(this.$storage.get('stepActive'))
+        let stages = this.$storage.getObj('stages')
+        this.stage = stages[step]
+        this.step = step
         console.log(this.stage)
-        console.log(this.$storage.getObj('audioPairList')[this.stage - 1])
-        // TODO 获取音频url及填入
-        this.audios = this.$storage.getObj('audioPairList')[this.stage - 1]
-        this.audios.audioList[0].formName = '音频A'
-        this.audios.audioList[1].formName = '音频B'
-        this.constAudioList = this.$storage.getObj('audioPairList')[this.stage - 1].audioList
+        let audioPairList = this.$storage.getObj('audioPairList')
+        if (step < 3) {
+            console.log(audioPairList[this.stage])
+            // stage 0-1 2-3 4-5
+            this.audios = audioPairList[this.stage].audioList
+        } else if(step === 3){
+            // 冒泡比较
+            if (this.stage % 2 === 0) {
+                // 首次,a【0和1】
+                console.log(audioPairList[this.stage / 2])
+                this.audios = audioPairList[this.stage / 2].audioList.slice(0, 2)
+            } else {
+                // 胜者与3比较
+                this.audios.push(audioPairList[(this.stage - 1)/2].audioList[1])
+                this.audios.push(audioPairList[(this.stage - 1)/2].audioList[2])
+            }
+        }else{
+            if(this.stage%4<2){
+                this.audios = audioPairList[this.stage].audioList
+            }else{
+                this.audios = audioPairList[this.stage-2].audioList
+            }
+        }
+        this.audios[0].formName = '音频A'
+        this.audios[1].formName = '音频B'
     },
     mounted() {
 
@@ -62,76 +64,67 @@ export default {
 
     methods: {
         onNext() {
-            // this.$refs["ruleForm"].validate(valid => {
-            //     if (valid) {
-            console.log(this.ruleForm)
-            console.log(this.audios.audioList)
-            // this.$http({
-            //     url: this.$api.submitAudioForm,
-            //     method: "post",
-            //     data: this.ruleForm
-            // }).then(({data}) => {
-            //     if (data && data.code === "0") {
-            //         this.$message({
-            //             message: data.msg,
-            //             type: "success",
-            //             duration: 1000,
-            //         });
-            //     } else {
-            //         this.$message.error(data.message);
-            //     }
-            // });
-            // console.log(this.ruleForm)
-            for (let i = 0; i < this.constAudioList.length; i++) {
-                let res = {}
-                if (this.constAudioList[i].id === this.audios.audioList[i].id) {
-                    if (this.constAudioList[i].processMode === 1) {
-                        // 前向
-                        res.score = i === 0 ? "1-0" : "0-1"
-
-                    } else {
-                        res.score = i === 0 ? "0-1" : "1-0";
-                    }
-                } else {
-                    if (this.constAudioList[i].processMode === 1) {
-                        // 前向
-                        res.score = i === 0 ? "0-1" : "1-0"
-
-                    } else {
-                        res.score = i === 0 ? "1-0" : "0-1";
-                    }
+            if (this.step < 3) {
+                // 存排序序列
+                let order = []
+                for (let i = 0; i < this.audios.length; i++) {
+                    order.push(this.audios[i].aid)
                 }
-                res.uid = Number(this.$storage.get('userid'))
-                res.aid = this.constAudioList[i].id
-                res.material = this.constAudioList[i].material
-                res.processMode = this.constAudioList[i].processMode
-                console.log(res)
+                for (let i = 0; i < this.audios.length; i++) {
+                    this.audios[i].order = order
+                    this.audios[i].uid = Number(this.$storage.get('userid'))
+                    // 存入localStorage
+                    let result = this.$storage.getObj('resultOfStep1')
+                    result = eval(result)
+                    result[2 * Number(this.stage) + i] = this.audios[i]
+                    console.log(result)
+                    this.$storage.set('resultOfStep1', result)
+                }
+            } else if (this.step === 3) {
+                this.updateAudioPairList()
+            } else if(this.step === 4){
+                let audioPairList = this.$storage.getObj('audioPairList')
+                if(this.audios[0].processMode === 1){
+                    // front compare
+                    this.addScore(this.audios[0])
+                    this.subScore(this.audios[1])
+                }else{
+                    this.addScore(this.audios[1])
+                    this.subScore(this.audios[0])
+                }
 
-                let result = this.$storage.getObj('resultOfStep1')
-                result = eval(result)
-
-                result[2 * (Number(this.stage) - 1) + i] = res
-                console.log(result)
-                this.$storage.set('resultOfStep1', result)
+                audioPairList[this.stage%4<2?this.stage:this.stage-2].audioList = this.audios
+                // 0 1 2 3   4 5 6 7
+                if(this.stage%4===1){
+                    // update 2 3
+                    let audioPair2={audioList:[]}
+                    let audioPair3={audioList:[]}
+                    for(let i=0;i<audioPairList.length;i++){
+                        let audioList = audioPairList[i].audioList
+                        for(let j=0;j<audioList.length;j++){
+                            if(audioList[j].score==="1-0") audioPair2.audioList.push(audioList[j])
+                            else audioPair3.audioList.push(audioList[j])
+                        }
+                    }
+                    audioPairList[this.stage-1] = audioPair2
+                    audioPairList[this.stage] = audioPair3
+                }
+                this.$storage.set('audioPairList', audioPairList)
             }
-            console.log(this.stage)
-
 
             let step = Number(this.$storage.get('stepActive'))
             let stages = this.$storage.getObj('stages')
             // 对应计数器++
-            stages[step] = this.stage
+            stages[step]++
             this.$storage.set('stages', stages)
-            // stage++
-            this.$storage.set('stageOfStep', (Number(this.stage) + 1).toString())
-            if (Number(this.stage) >= 8 && step === 1) {
-                // 结束第一轮！
-                let data = {}
-                data.scoreList = eval(this.$storage.getObj('resultOfStep1'))
+
+            if (Number(this.stage) >= 7 && step === 1) {
+                // 结束第2轮！
+                let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
-                    url: this.$api.submitStep1,
+                    url: this.$api.submitStep2,
                     method: "post",
-                    data: data
+                    data: scoreList
                 }).then(({data}) => {
                     if (data && data.code === "0") {
                         this.$message({
@@ -145,13 +138,13 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 6 && step === 2) {
-                let data = {}
-                data.scoreList = eval(this.$storage.getObj('resultOfStep1'))
+            } else if (Number(this.stage) >= 5 && step === 2) {
+                // 结束第3轮！
+                let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
-                    url: this.$api.submitStep1,
+                    url: this.$api.submitStep3,
                     method: "post",
-                    data: data
+                    data: scoreList
                 }).then(({data}) => {
                     if (data && data.code === "0") {
                         this.$message({
@@ -165,13 +158,16 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 4 && step === 3) {
-                let data = {}
-                data.scoreList = eval(this.$storage.getObj('resultOfStep1'))
+            } else if (Number(this.stage) >= 3 && step === 3) {
+                // 结束第4轮！
+                let audioPairList = eval(this.$storage.getObj('audioPairList'))
+                let params={}
+                params.uid = Number(this.$storage.get('userid'))
                 this.$http({
-                    url: this.$api.submitStep1,
+                    url: this.$api.submitStep4,
                     method: "post",
-                    data: data
+                    data: audioPairList,
+                    params: params
                 }).then(({data}) => {
                     if (data && data.code === "0") {
                         this.$message({
@@ -185,13 +181,16 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 4 && step === 4) {
-                let data = {}
-                data.scoreList = eval(this.$storage.getObj('resultOfStep1'))
+            } else if (Number(this.stage) >= 3 && step === 4) {
+                // 结束第5轮！
+                let audioPairList = eval(this.$storage.getObj('audioPairList'))
+                let params={}
+                params.uid = Number(this.$storage.get('userid'))
                 this.$http({
-                    url: this.$api.submitStep1,
+                    url: this.$api.submitStep5,
                     method: "post",
-                    data: data
+                    data: audioPairList,
+                    params:params
                 }).then(({data}) => {
                     if (data && data.code === "0") {
                         this.$message({
@@ -207,15 +206,37 @@ export default {
                 return;
             }
             location.reload()
-
-            // this.reload()
-            // this.$scrollTo()
-            //     }
-            // });
         },
         update(value) {
             console.log(value)
-            this.audios.audioList = value
+            this.audios = value
+        },
+        updateAudioPairList() {
+            console.log(this.$storage.getObj('audioPairList')[this.stage % 2 === 0 ? this.stage : this.stage - 1])
+            let audioPairList = this.$storage.getObj('audioPairList')
+            let audioList = []
+            if (this.stage % 2 === 0) {
+                // 第一次冒泡
+                audioList = audioPairList[this.stage/2].audioList
+                audioList[0] = this.audios[0].processMode === 1 ? this.audios[1] : this.audios[0]
+                audioList[1] = this.audios[0].processMode === 1 ? this.audios[0] : this.audios[1]
+            }else{
+                // second
+                audioList = audioPairList[(this.stage-1)/2].audioList
+                audioList[1] = this.audios[0].processMode === 1 ? this.audios[1] : this.audios[0]
+                audioList[2] = this.audios[0].processMode === 1 ? this.audios[0] : this.audios[1]
+            }
+            this.$storage.set('audioPairList', audioPairList)
+        },
+        addScore(audio){
+            if(audio.score===null) audio.score = "0-0"
+            let strs = audio.score.split("-")
+            audio.score = (Number(strs[0])+1).toString()+"-"+strs[1]
+        },
+        subScore(audio){
+            if(audio.score===null) audio.score = "0-0"
+            let strs = audio.score.split("-")
+            audio.score = strs[0]+"-"+(Number(strs[1])+1).toString()
         }
     }
 }
