@@ -13,9 +13,9 @@
                 暂停
             </el-button>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedRefer" ref="参考音频" :src="audioList[0].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="audioList[1].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="audioList[2].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedRefer" ref="参考音频" :src="urls[0]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="urls[1]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="urls[2]"></audio>
 <!--        <el-button @click="clickRefer">参考音频</el-button>-->
         <!--        </div>-->
 
@@ -44,7 +44,6 @@ export default {
     components: {draggable, dragItem},
     name: "ThreeAudio",
     props: {
-
         audioList: {
             type: Array,
             default: () => [
@@ -94,11 +93,13 @@ export default {
 
             isLoop: true,
 
-
+            urls:[]
         }
     },
     mounted() {
-
+        for(let i=0;i<this.audioList.length;i++){
+            this.urls.push(this.audioList[i].url)
+        }
     },
     methods: {
         play() {
@@ -146,6 +147,7 @@ export default {
         onEnd() {
             let value = this.myAudios
             console.log(value)
+            console.log(this.audioList)
             this.$emit("onChildUpdate", value)
         },
         overPlay() {

@@ -12,8 +12,8 @@
                 暂停
             </el-button>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="myAudios[0].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="myAudios[1].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="urls[0]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="urls[1]"></audio>
         <!--        </div>-->
 
         <div style="display: flex;margin-top: 1em">
@@ -61,11 +61,14 @@ export default {
 
             isLoop: true,
 
-
+            urls:[]
         }
     },
     mounted() {
         console.log(this.myAudios)
+        for(let i=0;i<this.audios.length;i++){
+            this.urls.push(this.audios[i].url)
+        }
     },
     methods: {
         play() {

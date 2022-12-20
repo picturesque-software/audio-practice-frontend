@@ -6,6 +6,8 @@ const api = {
     login: '/user/login',
     register:'/user/register',
     getUserById:'/user/getById',
+    // restart
+    restart:'/user/restart',
 
     // 获取各阶段音频信息
     getAudiosStep1:'/step/getAudioForStep1',
@@ -19,7 +21,9 @@ const api = {
     submitStep2:'/step/submitStep2',
     submitStep3:'/step/submitStep3',
     submitStep4:'/step/submitStep4',
-    submitStep5:'/step/submitStep5'
+    submitStep5:'/step/submitStep5',
+
+
 }
 
 export default api

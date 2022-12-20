@@ -50,6 +50,24 @@ export default {
             this.$router.push({path:'/finishStep'+this.step.toString()})
         },
         restart(){
+            let params={}
+            params.uid = Number(this.$storage.get('userid'))
+            this.$http({
+                url: this.$api.restart,
+                method: "post",
+                params: params
+            }).then(({data}) => {
+                if (data && data.code === "0") {
+                    this.$message({
+                        message: data.msg,
+                        type: "success",
+                        duration: 2000,
+                    })
+                    location.reload()
+                } else {
+                    this.$message.error(data.msg);
+                }
+            });
 
         },
         enter(){

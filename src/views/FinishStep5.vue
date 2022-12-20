@@ -12,6 +12,7 @@
         <!-- 内容区域 -->
         <!-- <img src="../assets/src=http___p4.itc.cn_q_70_images01_20210506_628477c0733b44ac898ed640b2e473c1.jpeg&refer=http___p4.itc.webp" alt class="tupian-img" /> -->
         <el-button type="primary" @click="enter">庆祝一下</el-button>
+        <el-button type="primary" @click="back">返回</el-button>
     </div>
 </template>
 
@@ -29,6 +30,9 @@ export default {
     methods: {
         enter(){
             this.congratulate=true
+        },
+        back(){
+            this.$router.push({path:'/welcome'})
         }
     },
 };
