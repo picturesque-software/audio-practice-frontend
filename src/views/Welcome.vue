@@ -79,8 +79,9 @@ export default {
                     let audioPairList = data.data
                     this.$storage.set('audioPairList', audioPairList)
                     console.log(this.$storage.getObj('audioPairList'))
+                    // 各阶段进度
                     this.$storage.set('stages',[0,0,0,0,0])
-                    // step
+                    // 当前所处阶段
                     this.$storage.set('stepActive',0)
                     let result=JSON.parse(JSON.stringify([]))
                     console.log(result)

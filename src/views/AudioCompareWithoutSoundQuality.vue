@@ -23,6 +23,8 @@ export default {
         return {
             step: '',
             stage: '',
+            // 用于第五轮瑞士轮迭代
+            pairIndex:'',
             audios: []
         }
     },
@@ -49,11 +51,21 @@ export default {
                 this.audios.push(audioPairList[(this.stage - 1)/2].audioList[2])
             }
         }else{
+            //0(0) 1(1) 2(0) 3(1) 4(2) 5(3)  28(14) 29(15) 30(14) 31(15)
             if(this.stage%4<2){
-                this.audios = audioPairList[this.stage].audioList
+                if(this.stage % 2 === 0){
+                    this.pairIndex = this.stage/2
+                }else{
+                    this.pairIndex = (this.stage+1)/2
+                }
             }else{
-                this.audios = audioPairList[this.stage-2].audioList
+                if(this.stage % 2 === 0){
+                    this.pairIndex = (this.stage-2)/2
+                }else{
+                    this.pairIndex = (this.stage-1)/2
+                }
             }
+            this.audios = audioPairList[this.pairIndex].audioList
         }
         this.audios[0].formName = '音频A'
         this.audios[1].formName = '音频B'
@@ -80,9 +92,11 @@ export default {
                     console.log(result)
                     this.$storage.set('resultOfStep1', result)
                 }
-            } else if (this.step === 3) {
+            }
+            else if (this.step === 3) {
                 this.updateAudioPairList()
-            } else if(this.step === 4){
+            }
+            else if(this.step === 4){
                 let audioPairList = this.$storage.getObj('audioPairList')
                 if(this.audios[0].processMode === 1){
                     // front compare
@@ -93,21 +107,22 @@ export default {
                     this.subScore(this.audios[0])
                 }
 
-                audioPairList[this.stage%4<2?this.stage:this.stage-2].audioList = this.audios
-                // 0 1 2 3   4 5 6 7
+                // 更新分数
+                audioPairList[this.pairIndex].audioList = this.audios
+                // 0 1(update) 2 3   4 5(update) 6 7
                 if(this.stage%4===1){
                     // update 2 3
                     let audioPair2={audioList:[]}
                     let audioPair3={audioList:[]}
-                    for(let i=0;i<audioPairList.length;i++){
+                    for(let i=this.pairIndex-1;i<this.pairIndex+1;i++){
                         let audioList = audioPairList[i].audioList
                         for(let j=0;j<audioList.length;j++){
                             if(audioList[j].score==="1-0") audioPair2.audioList.push(audioList[j])
                             else audioPair3.audioList.push(audioList[j])
                         }
                     }
-                    audioPairList[this.stage-1] = audioPair2
-                    audioPairList[this.stage] = audioPair3
+                    audioPairList[this.pairIndex-1] = audioPair2
+                    audioPairList[this.pairIndex] = audioPair3
                 }
                 this.$storage.set('audioPairList', audioPairList)
             }
@@ -118,7 +133,7 @@ export default {
             stages[step]++
             this.$storage.set('stages', stages)
 
-            if (Number(this.stage) >= 7 && step === 1) {
+            if (Number(this.stage) >= 63 && step === 1) {
                 // 结束第2轮！
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
@@ -138,7 +153,7 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 5 && step === 2) {
+            } else if (Number(this.stage) >= 47 && step === 2) {
                 // 结束第3轮！
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
@@ -158,7 +173,7 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 3 && step === 3) {
+            } else if (Number(this.stage) >= 31 && step === 3) {
                 // 结束第4轮！
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
                 let params={}
@@ -181,7 +196,7 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 3 && step === 4) {
+            } else if (Number(this.stage) >= 31 && step === 4) {
                 // 结束第5轮！
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
                 let params={}

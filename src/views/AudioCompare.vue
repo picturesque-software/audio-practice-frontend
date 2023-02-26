@@ -184,7 +184,7 @@ export default {
                     stages[step]++
                     this.$storage.set('stages', stages)
 
-                    if (Number(this.stage) >= 7) {
+                    if (Number(this.stage) >= 63) {
                         // 结束第一轮！
                         let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                         this.$http({
