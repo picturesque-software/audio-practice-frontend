@@ -1,5 +1,10 @@
 <template>
-    <div style="margin: 2px">
+    <div
+        style="margin: 2px"
+        v-loading="loading"
+        element-loading-text="提交中"
+        element-loading-spinner="el-icon-loading"
+    >
         <p>评测流程：点击播放，默认播放<span style="color:red">音频A</span>。</p>
         <p>点击待评测音频AB方块以切换听音，并拖动方块对音频AB进行排序。<span style="color:red">注意前后~</span></p>
         <two-audio
@@ -7,7 +12,8 @@
             @update="update"
         ></two-audio>
 
-        <el-button style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
+        <el-button v-if="(Number(this.stage) === 63 && step === 1) || (Number(this.stage) === 47 && step === 2) || (Number(this.stage) === 31 && step === 3) || (Number(this.stage) === 31 && step === 4)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
+        <el-button v-else style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
         <!--        <el-button>取消</el-button>-->
     </div>
 </template>
@@ -21,6 +27,7 @@ export default {
 
     data() {
         return {
+            loading:false,
             step: '',
             stage: '',
             // 用于第五轮瑞士轮迭代
@@ -133,8 +140,9 @@ export default {
             stages[step]++
             this.$storage.set('stages', stages)
 
-            if (Number(this.stage) >= 63 && step === 1) {
+            if (Number(this.stage) === 63 && step === 1) {
                 // 结束第2轮！
+                this.loading=true
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
                     url: this.$api.submitStep2,
@@ -147,14 +155,16 @@ export default {
                             type: "success",
                             duration: 1000,
                         })
+                        this.loading=false
                         this.$router.push({path: '/finishStep2'})
                     } else {
                         this.$message.error(data.msg);
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 47 && step === 2) {
+            } else if (Number(this.stage) === 47 && step === 2) {
                 // 结束第3轮！
+                this.loading=true
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                 this.$http({
                     url: this.$api.submitStep3,
@@ -167,14 +177,16 @@ export default {
                             type: "success",
                             duration: 1000,
                         })
+                        this.loading=false
                         this.$router.push({path: '/finishStep3'})
                     } else {
                         this.$message.error(data.msg);
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 31 && step === 3) {
+            } else if (Number(this.stage) === 31 && step === 3) {
                 // 结束第4轮！
+                this.loading=true
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
                 let params={}
                 params.uid = Number(this.$storage.get('userid'))
@@ -190,14 +202,16 @@ export default {
                             type: "success",
                             duration: 1000,
                         })
+                        this.loading=false
                         this.$router.push({path: '/finishStep4'})
                     } else {
                         this.$message.error(data.msg);
                     }
                 });
                 return;
-            } else if (Number(this.stage) >= 31 && step === 4) {
+            } else if (Number(this.stage) === 31 && step === 4) {
                 // 结束第5轮！
+                this.loading=true
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
                 let params={}
                 params.uid = Number(this.$storage.get('userid'))
@@ -213,6 +227,7 @@ export default {
                             type: "success",
                             duration: 1000,
                         })
+                        this.loading=false
                         this.$router.push({path: '/finishStep5'})
                     } else {
                         this.$message.error(data.msg);

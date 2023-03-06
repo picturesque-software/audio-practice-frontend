@@ -13,9 +13,9 @@
                 暂停
             </el-button>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedRefer" ref="参考音频" :src="urls[0]"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="urls[1]"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="urls[2]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频" :src="urls[0]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频A" :src="urls[1]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频B" :src="urls[2]"></audio>
 <!--        <el-button @click="clickRefer">参考音频</el-button>-->
         <!--        </div>-->
 
@@ -100,6 +100,7 @@ export default {
         for(let i=0;i<this.audioList.length;i++){
             this.urls.push(this.audioList[i].url)
         }
+        // this.play()
     },
     methods: {
         play() {

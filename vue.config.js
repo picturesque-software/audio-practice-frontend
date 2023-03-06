@@ -37,6 +37,7 @@ module.exports = {
         https: false, // 是否开启https模式
         proxy: { // 请求代理服务器
             '/audio': { //带上api前缀的
+                // 交给宝塔，这里配置无效了
                 // target: 'http://124.70.156.214:5000', //代理目标地址
                 target: 'http://127.0.0.1:8083', //代理目标地址
                 changeOrigin: true,

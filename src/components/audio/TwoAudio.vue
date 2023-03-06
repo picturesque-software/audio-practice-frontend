@@ -69,6 +69,7 @@ export default {
         for(let i=0;i<this.audios.length;i++){
             this.urls.push(this.audios[i].url)
         }
+        // this.play()
     },
     methods: {
         play() {

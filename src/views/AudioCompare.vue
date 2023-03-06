@@ -1,5 +1,9 @@
 <template>
-    <div style="margin: 2px">
+    <div style="margin: 2px"
+         v-loading="loading"
+         element-loading-text="提交中"
+         element-loading-spinner="el-icon-loading"
+    >
         <p>评测流程：点击播放，默认播放<span style="color:red">参考音频</span>。点击待评测音频AB方块以切换听音，并以参考音频为基准进行音质评价。最后请拖动对音频A、B以及参考音频进行纵深排序。<span style="color:red">注意前后~</span></p>
         <three-audio
             :audioList="audios"
@@ -58,8 +62,8 @@
             </div>
         </div>
 
-        <el-button type="primary" @click="onNext">下一步</el-button>
-        <!--        <el-button>取消</el-button>-->
+        <el-button v-if="(Number(this.stage) === 63)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
+        <el-button v-else style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
     </div>
 </template>
 
@@ -72,6 +76,8 @@ export default {
 
     data() {
         return {
+            loading:false,
+
             currentSelectAudio:'音频A',
 
             stage: '',
@@ -184,8 +190,9 @@ export default {
                     stages[step]++
                     this.$storage.set('stages', stages)
 
-                    if (Number(this.stage) >= 63) {
+                    if (Number(this.stage) === 63) {
                         // 结束第一轮！
+                        this.loading=true
                         let scoreList = eval(this.$storage.getObj('resultOfStep1'))
                         this.$http({
                             url: this.$api.submitStep1,
@@ -198,6 +205,7 @@ export default {
                                     type: "success",
                                     duration: 1000,
                                 })
+                                this.loading=false
                                 this.$router.push({path: '/finishStep1'})
                             } else {
                                 this.$message.error(data.msg);
