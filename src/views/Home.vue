@@ -115,6 +115,7 @@ export default {
 
 .gif{
     width: 100%;
+    height: 40%;
 }
 .jianbian {
     height: 1000px;

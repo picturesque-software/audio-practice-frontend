@@ -5,8 +5,9 @@
         </el-card> -->
         <!--        <router-view></router-view>-->
         <h1 class="h1">欢迎来到空间音频主观评价系统！</h1>
-        <img src="../assets/home.gif" alt class="gif" />
-        <p class="p">您即将开启一段愉快的听音评价之旅，涉及音质和纵深定位评价两个部分。在您第一次听到一个音频时，需要为它的音质给出您的评价，往后只需要着重去听音频的纵深感受即可！祝您评价顺利！</p>
+        <img src="../assets/home.gif" alt class="gif"/>
+        <p class="p">
+            您即将开启一段愉快的听音评价之旅，涉及音质和纵深定位评价两个部分。在您第一次听到一个音频时，需要为它的音质给出您的评价，往后只需要着重去听音频的纵深感受即可！祝您评价顺利！</p>
         <el-button v-if="!hasRecord" type="primary" @click="enter">进入</el-button>
         <div v-if="hasRecord">
             <p>请选择：</p>
@@ -22,11 +23,12 @@
 export default {
     data() {
         return {
-            hasRecord:'',
-            step:''
+            hasRecord: '',
+            step: ''
         };
     },
-    created() {},
+    created() {
+    },
     mounted() {
         let params = {
             id: this.$storage.get("userid")
@@ -46,31 +48,39 @@ export default {
 
     },
     methods: {
-        goLast(){
-            this.$router.push({path:'/finishStep'+this.step.toString()})
+        goLast() {
+            this.$router.push({path: '/finishStep' + this.step.toString()})
         },
-        restart(){
-            let params={}
-            params.uid = Number(this.$storage.get('userid'))
-            this.$http({
-                url: this.$api.restart,
-                method: "post",
-                params: params
-            }).then(({data}) => {
-                if (data && data.code === "0") {
-                    this.$message({
-                        message: data.msg,
-                        type: "success",
-                        duration: 2000,
-                    })
-                    location.reload()
-                } else {
-                    this.$message.error(data.msg);
-                }
-            });
+        restart() {
+            this.$confirm('重新开始将删除之前的评测记录，确定删除吗？', 'WARNING', {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type:'warning'
+            }).then(() => {
+                let params = {}
+                params.uid = Number(this.$storage.get('userid'))
+                this.$http({
+                    url: this.$api.restart,
+                    method: "post",
+                    params: params
+                }).then(({data}) => {
+                    if (data && data.code === "0") {
+                        this.$message({
+                            message: data.msg,
+                            type: "success",
+                            duration: 2000,
+                            onClose(){
+                                location.reload()
+                            }
+                        })
+                    } else {
+                        this.$message.error(data.msg);
+                    }
+                });
+            })
 
         },
-        enter(){
+        enter() {
             this.$http({
                 url: this.$api.getAudiosStep1,
                 method: "get",
@@ -80,17 +90,17 @@ export default {
                     this.$storage.set('audioPairList', audioPairList)
                     console.log(this.$storage.getObj('audioPairList'))
                     // 各阶段进度
-                    this.$storage.set('stages',[0,0,0,0,0])
+                    this.$storage.set('stages', [0, 0, 0, 0, 0])
                     // 当前所处阶段
-                    this.$storage.set('stepActive',0)
-                    let result=JSON.parse(JSON.stringify([]))
+                    this.$storage.set('stepActive', 0)
+                    let result = JSON.parse(JSON.stringify([]))
                     console.log(result)
-                    for(let i=0;i<audioPairList.length;i++){
+                    for (let i = 0; i < audioPairList.length; i++) {
                         result.push({})
                         result.push({})
                     }
-                    this.$storage.set('resultOfStep1',result)
-                    this.$router.push({path:'/stepsRoot/audioCompare'})
+                    this.$storage.set('resultOfStep1', result)
+                    this.$router.push({path: '/stepsRoot/audioCompare'})
                 } else {
                     this.$message.error(data.msg);
                 }
@@ -101,8 +111,8 @@ export default {
 </script>
 
 <style>
-.white-label-item .el-form-item__label{
-    color:white;
+.white-label-item .el-form-item__label {
+    color: white;
 }
 
 
@@ -120,9 +130,11 @@ export default {
     animation: w 2s steps(13) forwards;
     text-align: center;
 }
-.p{
+
+.p {
     color: antiquewhite;
 }
+
 @keyframes w {
     0% {
         width: 0;
@@ -132,9 +144,10 @@ export default {
     }
 }
 
-.gif{
+.gif {
     width: 100%;
 }
+
 .jianbian {
     height: 1000px;
     width: 100%;
@@ -153,6 +166,7 @@ export default {
     animation: bganimation 15s infinite;
     margin-top: -100px;
 }
+
 @keyframes bganimation {
     0% {
         background-position: 0% 50%;

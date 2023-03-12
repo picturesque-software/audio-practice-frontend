@@ -4,63 +4,60 @@
          element-loading-text="提交中"
          element-loading-spinner="el-icon-loading"
     >
-        <p>评测流程：点击播放，默认播放<span style="color:red">参考音频</span>。点击待评测音频AB方块以切换听音，并以参考音频为基准进行音质评价。最后请拖动对音频A、B以及参考音频进行纵深排序。<span style="color:red">注意前后~</span></p>
-        <three-audio
-            :audioList="audios"
-            @onChildUpdate="onChildUpdate"
-            @onChildClick="onChildClick"
-        ></three-audio>
-        <div style="display: flex;margin-top: 2em">
-            <div style="width: 20%;display: flex">
-                <div style="margin: auto;font-size: medium">{{currentSelectAudio}}</div>
-            </div>
-            <div style="width: 80%">
-                <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
-                         size="mini">
-                    <div v-if="currentSelectAudio==='音频A'">
-                        <el-form-item label="明亮度" prop="lightNess1">
-                            <el-radio-group v-model="ruleForm.lightNess1" size="mini">
-                                <el-radio :label="1">正常</el-radio>
-                                <el-radio :label="0">刺耳/暗淡</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="清晰度" prop="articulation1" style="flex: auto">
-                            <el-radio-group v-model="ruleForm.articulation1" size="mini">
-                                <el-radio :label="1">清晰</el-radio>
-                                <el-radio :label="0">模糊</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="失真与变调" prop="distortion1" style="flex: auto">
-                            <el-radio-group v-model="ruleForm.distortion1" size="mini">
-                                <el-radio :label="1">无失真</el-radio>
-                                <el-radio :label="0">有失真</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                    </div>
-                    <div v-if="currentSelectAudio==='音频B'">
-                        <el-form-item label="明亮度" prop="lightNess2" style="flex: auto">
-                            <el-radio-group v-model="ruleForm.lightNess2" size="mini">
-                                <el-radio :label="1">正常</el-radio>
-                                <el-radio :label="0">刺耳/暗淡</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="清晰度" prop="articulation2" style="flex: auto">
-                            <el-radio-group v-model="ruleForm.articulation2" size="mini">
-                                <el-radio :label="1">清晰</el-radio>
-                                <el-radio :label="0">模糊</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
-                            <el-radio-group v-model="ruleForm.distortion2" size="mini">
-                                <el-radio :label="1">无失真</el-radio>
-                                <el-radio :label="0">有失真</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                    </div>
+        <p>评测流程：默认播放<span style="color:red">参考音频</span>。点击点击待评测音频AB方块以切换听音，并以参考音频为基准进行音质评价。最后请拖动对音频A、B以及参考音频进行纵深排序。<span style="color:red">注意前后~</span></p>
+        <el-tabs
+        >
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-date"></i>行程</span>
+                <three-audio
+                    :audioList="audios"
+                    @onChildUpdate="onChildUpdate"
+                    @onChildClick="onChildClick"
+                ></three-audio>
+                <el-divider></el-divider>
+                <div>
+<!--                    <div style="width: 20%;display: flex">-->
+<!--                        <div style="margin: auto;font-size: medium">{{currentSelectAudio}}</div>-->
+<!--                    </div>-->
+<!--                    <div style="width: 80%">-->
+                        <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                                 size="mini">
+                            <div v-if="currentSelectAudio==='音频A'">
+                                <el-form-item label="音色评价" prop="lightNess1">
+                                    <div style="width: 50%; margin-left: 30%">
+                                        <el-slider
+                                            @change="changeToneScore"
+                                            class="slider"
+                                            v-model="ruleForm.lightNess1"
+                                            :step="1"
+                                            :max="2"
+                                            :min="0"
+                                            :marks="marks"
+                                            :format-tooltip="formatTooltipScore"
+                                            show-stops>
+                                        </el-slider>
+                                    </div>
+                                </el-form-item>
+                            </div>
+                            <div v-if="currentSelectAudio==='音频B'">
 
-                </el-form>
-            </div>
-        </div>
+                                <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
+                                    <el-radio-group v-model="ruleForm.distortion2" size="mini">
+                                        <el-radio :label="1">无失真</el-radio>
+                                        <el-radio :label="0">有失真</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </div>
+
+                        </el-form>
+<!--                    </div>-->
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="消息中心">消息中心</el-tab-pane>
+            <el-tab-pane label="角色管理">角色管理</el-tab-pane>
+            <el-tab-pane label="定时任务补偿">定时任务补偿</el-tab-pane>
+        </el-tabs>
+
 
         <el-button v-if="(Number(this.stage) === 63)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
         <el-button v-else style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
@@ -76,6 +73,19 @@ export default {
 
     data() {
         return {
+            reverb1: 0,
+            reverb2: 0,
+            marksReverb:{
+                0: '未处理',
+                1: '轻微混响',
+                2: '较大混响'
+            },
+            marks:{
+                0: '差异较大',
+                1: '有一定偏差',
+                2: '与参考相近'
+            },
+
             loading:false,
 
             currentSelectAudio:'音频A',
@@ -87,7 +97,7 @@ export default {
 
 
             ruleForm: {
-                lightNess1: '',
+                lightNess1: 2,
                 lightNess2: '',
                 articulation1: '',
                 articulation2: '',
@@ -136,6 +146,18 @@ export default {
     },
 
     methods: {
+        formatTooltipScore(val){
+            if(val===0){
+                return '差异较大'
+            }else if(val===1){
+                return  '有一定偏差'
+            }else{
+                return '与参考接近'
+            }
+        },
+        changeToneScore(val){
+            console.log("tone score"+val)
+        },
         onNext() {
             this.$refs["ruleForm"].validate(valid => {
                 if (valid) {
@@ -232,4 +254,9 @@ export default {
 .audioPlayer {
     display: inline-block;
 }
+.slider{
+    /* fix slider last Chinese mark not breaking properly */
+    word-break: keep-all;
+}
+
 </style>

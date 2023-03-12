@@ -13,6 +13,22 @@
                 暂停
             </el-button>
         </div>
+        <div style="display: flex">
+            <div style="margin: auto;width: 50%">
+                <span>混响调节</span>
+                <el-slider
+                    @change="changeReverb"
+                    class="slider"
+                    v-model="reverb1"
+                    :step="1"
+                    :max="2"
+                    :min="0"
+                    :marks="marksReverb"
+                    :format-tooltip="formatTooltipReverb"
+                    show-stops>
+                </el-slider>
+            </div>
+        </div>
         <audio @ended="overPlay" :loop="isLoop" ref="参考音频" :src="urls[0]"></audio>
         <audio @ended="overPlay" :loop="isLoop" ref="音频A" :src="urls[1]"></audio>
         <audio @ended="overPlay" :loop="isLoop" ref="音频B" :src="urls[2]"></audio>
@@ -79,6 +95,14 @@ export default {
     },
     data() {
         return {
+            reverb1: 0,
+            reverb2: 0,
+            marksReverb:{
+                0: '未处理',
+                1: '轻微混响',
+                2: '较大混响'
+            },
+
             myAudios: this.audioList,
 
             isPlaying: false,
@@ -103,6 +127,18 @@ export default {
         // this.play()
     },
     methods: {
+        changeReverb(val){
+            console.log(val)
+        },
+        formatTooltipReverb(val){
+            if(val===0){
+                return '未处理'
+            }else if(val===1){
+                return  '轻微混响'
+            }else{
+                return '较大混响'
+            }
+        },
         play() {
             if (this.$refs['音频A'].paused && this.$refs['音频B'].paused && this.$refs['参考音频'].paused) {
                 for (let i = 0; i < this.audioRefs.length; i++) {
@@ -188,5 +224,9 @@ export default {
 }
 .chosen {
     border: solid 2px #409EFF !important;
+}
+.slider{
+    /* fix slider last Chinese mark not breaking properly */
+    word-break: keep-all;
 }
 </style>
