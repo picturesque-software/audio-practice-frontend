@@ -4,22 +4,21 @@
          element-loading-text="提交中"
          element-loading-spinner="el-icon-loading"
     >
-        <p>评测流程：默认播放<span style="color:red">参考音频</span>。点击点击待评测音频AB方块以切换听音，并以参考音频为基准进行音质评价。最后请拖动对音频A、B以及参考音频进行纵深排序。<span style="color:red">注意前后~</span></p>
+        <p>评测流程：默认播放<span style="color:red">参考音频</span>。点击待评测音频AB方块以切换听音，并以参考音频为基准进行音色评价。最后请拖动对音频A、B以及参考音频进行前后听感排序（可调节音频混响来辅助判断）。<span style="color:red">注意前后哦~</span></p>
         <el-tabs
+            @tab-click="changeTab"
+            :stretch="true"
         >
             <el-tab-pane>
-                <span slot="label"><i class="el-icon-date"></i>行程</span>
+                <span slot="label"><i class="el-icon-wind-power"></i> 枪声</span>
                 <three-audio
-                    :audioList="audios"
+                    ref="thAudio0"
+                    :audioList="audios[0]"
                     @onChildUpdate="onChildUpdate"
                     @onChildClick="onChildClick"
                 ></three-audio>
                 <el-divider></el-divider>
                 <div>
-<!--                    <div style="width: 20%;display: flex">-->
-<!--                        <div style="margin: auto;font-size: medium">{{currentSelectAudio}}</div>-->
-<!--                    </div>-->
-<!--                    <div style="width: 80%">-->
                         <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
                                  size="mini">
                             <div v-if="currentSelectAudio==='音频A'">
@@ -53,9 +52,135 @@
 <!--                    </div>-->
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="消息中心">消息中心</el-tab-pane>
-            <el-tab-pane label="角色管理">角色管理</el-tab-pane>
-            <el-tab-pane label="定时任务补偿">定时任务补偿</el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-position"></i> 脚步</span>
+                <three-audio
+                    ref="thAudio1"
+                    :audioList="audios[1]"
+                    @onChildUpdate="onChildUpdate"
+                    @onChildClick="onChildClick"
+                ></three-audio>
+                <el-divider></el-divider>
+                <div>
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                             size="mini">
+                        <div v-if="currentSelectAudio==='音频A'">
+                            <el-form-item label="音色评价" prop="lightNess1">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm.lightNess1"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
+                            </el-form-item>
+                        </div>
+                        <div v-if="currentSelectAudio==='音频B'">
+
+                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
+                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
+                                    <el-radio :label="1">无失真</el-radio>
+                                    <el-radio :label="0">有失真</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+
+                    </el-form>
+                    <!--                    </div>-->
+                </div>
+            </el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-male"></i> 男声</span>
+                <three-audio
+                    ref="thAudio2"
+                    :audioList="audios[2]"
+                    @onChildUpdate="onChildUpdate"
+                    @onChildClick="onChildClick"
+                ></three-audio>
+                <el-divider></el-divider>
+                <div>
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                             size="mini">
+                        <div v-if="currentSelectAudio==='音频A'">
+                            <el-form-item label="音色评价" prop="lightNess1">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm.lightNess1"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
+                            </el-form-item>
+                        </div>
+                        <div v-if="currentSelectAudio==='音频B'">
+
+                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
+                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
+                                    <el-radio :label="1">无失真</el-radio>
+                                    <el-radio :label="0">有失真</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+
+                    </el-form>
+                    <!--                    </div>-->
+                </div>
+            </el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-female"></i> 女声</span>
+                <three-audio
+                    ref="thAudio3"
+                    :audioList="audios[3]"
+                    @onChildUpdate="onChildUpdate"
+                    @onChildClick="onChildClick"
+                ></three-audio>
+                <el-divider></el-divider>
+                <div>
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                             size="mini">
+                        <div v-if="currentSelectAudio==='音频A'">
+                            <el-form-item label="音色评价" prop="lightNess1">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm.lightNess1"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
+                            </el-form-item>
+                        </div>
+                        <div v-if="currentSelectAudio==='音频B'">
+
+                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
+                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
+                                    <el-radio :label="1">无失真</el-radio>
+                                    <el-radio :label="0">有失真</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+
+                    </el-form>
+                    <!--                    </div>-->
+                </div>
+            </el-tab-pane>
         </el-tabs>
 
 
@@ -73,8 +198,7 @@ export default {
 
     data() {
         return {
-            reverb1: 0,
-            reverb2: 0,
+            tabIndex:0,
             marksReverb:{
                 0: '未处理',
                 1: '轻微混响',
@@ -92,9 +216,7 @@ export default {
 
             stage: '',
 
-            constAudioList: [],
             audios: [],
-
 
             ruleForm: {
                 lightNess1: 2,
@@ -133,19 +255,36 @@ export default {
         console.log(this.stage)
         console.log(this.$storage.getObj('audioPairList')[this.stage])
         // 处理成audios[0]为参考音频，1,2为A、B
-        let resAudios = this.$storage.getObj('audioPairList')[this.stage]
-        resAudios.referAudio.formName = '参考音频'
-        resAudios.audioList[0].formName = '音频A'
-        resAudios.audioList[1].formName = '音频B'
-        this.audios.push(resAudios.referAudio)
-        this.audios.push.apply(this.audios, resAudios.audioList)
+        for(let i=0;i<4;i++){
+            let resAudios = this.$storage.getObj('audioPairList')[i*16+ this.stage]
+            resAudios.referAudio.formName = '参考音频'
+            resAudios.audioList[0].formName = '音频A'
+            resAudios.audioList[1].formName = '音频B'
+            let audiosItem=[]
+            audiosItem.push(resAudios.referAudio)
+            audiosItem.push.apply(audiosItem, resAudios.audioList)
+            this.audios.push(audiosItem)
+        }
         console.log(this.audios)
+        this.$nextTick(() => {
+            this.$refs.thAudio0.play()
+        })
     },
     mounted() {
 
     },
 
     methods: {
+        changeTab(tab){
+            if(this.$refs["thAudio"+this.tabIndex].getIsPlaying()) {
+                // 如果原tab在放，则停一下
+                this.$refs["thAudio"+this.tabIndex].play()
+            }
+
+            this.tabIndex=Number(tab.index)
+            this.$refs["thAudio"+this.tabIndex].play()
+            console.log("dad" + tab.index)
+        },
         formatTooltipScore(val){
             if(val===0){
                 return '差异较大'

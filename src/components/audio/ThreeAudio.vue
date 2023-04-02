@@ -19,19 +19,26 @@
                 <el-slider
                     @change="changeReverb"
                     class="slider"
-                    v-model="reverb1"
+                    v-model="reverb"
                     :step="1"
                     :max="2"
                     :min="0"
                     :marks="marksReverb"
                     :format-tooltip="formatTooltipReverb"
+                    :show-tooltip="false"
                     show-stops>
                 </el-slider>
             </div>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" ref="参考音频" :src="urls[0]"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频A" :src="urls[1]"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频B" :src="urls[2]"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb0" :src="audioList[0].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb1" :src="audioList[0].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb2" :src="audioList[0].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb0" :src="audioList[1].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb1" :src="audioList[1].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb2" :src="audioList[1].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb0" :src="audioList[2].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb1" :src="audioList[2].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb2" :src="audioList[2].reverb2"></audio>
 <!--        <el-button @click="clickRefer">参考音频</el-button>-->
         <!--        </div>-->
 
@@ -41,7 +48,7 @@
                        fallbackTolerance="3" group="material" animation="1000">
                 <transition-group style="height: 100%; display: flex">
                     <template v-for="(element, index) in myAudios">
-                        <drag-item @itemClick="clickAudio(element)" :class="currentAudio === element.formName ? 'activeItem':'item'" :key="element.formName" :index="index"
+                        <drag-item @itemClick="clickAudio(element)" :class="currentFormAudio === element.formName ? 'activeItem':'item'" :key="element.formName" :index="index"
                                    :audio="element">
                         </drag-item>
                     </template>
@@ -60,6 +67,10 @@ export default {
     components: {draggable, dragItem},
     name: "ThreeAudio",
     props: {
+        tabIndex:{
+            type: Number,
+            default:0
+        },
         audioList: {
             type: Array,
             default: () => [
@@ -70,7 +81,10 @@ export default {
                     "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B02k-3.5k.wav",
                     "processMode": 0,
                     "algorithm": 0,
-                    "material": 1
+                    "material": 1,
+                    "reverb1":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front5__L.wav",
+                    "reverb2":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front6__L.wav",
+
                 },
                 {
                     "id": 1,
@@ -79,7 +93,9 @@ export default {
                     "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_back1__L.wav",
                     "processMode": 1,
                     "algorithm": 1,
-                    "material": 1
+                    "material": 1,
+                    "reverb1":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front8__L.wav",
+                    "reverb2":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front9__L.wav",
                 },
                 {
                     "id": 9,
@@ -88,15 +104,16 @@ export default {
                     "url": "https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_back9__L.wav",
                     "processMode": 1,
                     "algorithm": 9,
-                    "material": 1
+                    "material": 1,
+                    "reverb1":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front16__L.wav",
+                    "reverb2":"https://audio-practice.oss-cn-hangzhou.aliyuncs.com/%E6%9E%AA%E5%A3%B0/%E6%9E%AA%E5%A3%B0_HRTF_front14__L.wav",
                 }
             ]
         },
     },
     data() {
         return {
-            reverb1: 0,
-            reverb2: 0,
+            reverb: 0,
             marksReverb:{
                 0: '未处理',
                 1: '轻微混响',
@@ -107,9 +124,10 @@ export default {
 
             isPlaying: false,
 
-            audioRefs: ['参考音频', '音频A', '音频B'],
+            audioRefs: ['参考音频reverb0','参考音频reverb1','参考音频reverb2', '音频Areverb0', '音频Areverb1', '音频Areverb2', '音频Breverb0', '音频Breverb1', '音频Breverb2'],
 
-            currentAudio: '参考音频',
+            currentAudio: '参考音频reverb0',
+            currentFormAudio:'参考音频',
 
             isMutedRefer: true,
             isMutedAudio1: true,
@@ -120,15 +138,56 @@ export default {
             urls:[]
         }
     },
-    mounted() {
-        for(let i=0;i<this.audioList.length;i++){
-            this.urls.push(this.audioList[i].url)
-        }
-        // this.play()
+    created() {
+        // 父组件传来的audioList，0是参考音频，1,2是A，B音频
+        // this.$nextTick(() => {
+        //     this.play()
+        // })
+        console.log(this.audioList)
+        console.log("tabindex:" + this.tabIndex)
     },
     methods: {
         changeReverb(val){
-            console.log(val)
+            if(! (this.currentAudio.at(this.currentAudio.length-1) === val.toString()) ){
+                console.log(val)
+                if(this.currentFormAudio==='参考音频'){
+                    for(let i=0;i<3;i++){
+                        if(i===val){
+                            this.$refs['参考音频reverb'+i].muted = false
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }else{
+                            this.$refs['参考音频reverb'+i].muted = true
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }
+                    }
+                }else if(this.currentFormAudio==='音频A'){
+                    for(let i=0;i<3;i++){
+                        if(i===val){
+                            this.$refs['参考音频reverb'+i].muted = true
+                            this.$refs['音频Areverb'+i].muted = false
+                            this.$refs['音频Breverb'+i].muted = true
+                        }else{
+                            this.$refs['参考音频reverb'+i].muted = true
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }
+                    }
+                }else{
+                    for(let i=0;i<3;i++){
+                        if(i===val){
+                            this.$refs['参考音频reverb'+i].muted = true
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = false
+                        }else{
+                            this.$refs['参考音频reverb'+i].muted = true
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }
+                    }
+                }
+            }
         },
         formatTooltipReverb(val){
             if(val===0){
@@ -140,21 +199,25 @@ export default {
             }
         },
         play() {
-            if (this.$refs['音频A'].paused && this.$refs['音频B'].paused && this.$refs['参考音频'].paused) {
+            if (!this.isPlaying) {
                 for (let i = 0; i < this.audioRefs.length; i++) {
                     if (this.audioRefs[i] === this.currentAudio) continue
                     this.$refs[this.audioRefs[i]].muted = true
                 }
 
-                this.$refs['音频A'].play()
-                this.$refs['音频B'].play()
-                this.$refs['参考音频'].play()
+                for(let i = 0;i < 3; i++){
+                    this.$refs['音频Areverb'+i].play()
+                    this.$refs['音频Breverb'+i].play()
+                    this.$refs['参考音频reverb'+i].play()
+                }
 
                 this.isPlaying = true
             } else {
-                this.$refs['音频A'].pause()
-                this.$refs['音频B'].pause()
-                this.$refs['参考音频'].pause()
+                for(let i = 0;i < 3; i++){
+                    this.$refs['音频Areverb'+i].pause()
+                    this.$refs['音频Breverb'+i].pause()
+                    this.$refs['参考音频reverb'+i].pause()
+                }
 
                 this.isPlaying = false
             }
@@ -162,19 +225,45 @@ export default {
         clickAudio(element) {
             console.log(element)
             if (element.formName === "参考音频") {
-                this.$refs['音频A'].muted = true
-                this.$refs['音频B'].muted = true
-                this.$refs['参考音频'].muted = false
+                for(let i=0;i<3;i++){
+                    if(i===0){
+                        this.$refs['参考音频reverb'+i].muted = false
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }else{
+                        this.$refs['参考音频reverb'+i].muted = true
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }
+                }
             } else if(element.formName === "音频A"){
-                this.$refs['音频A'].muted = false
-                this.$refs['音频B'].muted = true
-                this.$refs['参考音频'].muted = true
+                for(let i=0;i<3;i++){
+                    if(i===0){
+                        this.$refs['参考音频reverb'+i].muted = true
+                        this.$refs['音频Areverb'+i].muted = false
+                        this.$refs['音频Breverb'+i].muted = true
+                    }else{
+                        this.$refs['参考音频reverb'+i].muted = true
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }
+                }
             } else if(element.formName === "音频B"){
-                this.$refs['音频A'].muted = true
-                this.$refs['音频B'].muted = false
-                this.$refs['参考音频'].muted = true
+                for(let i=0;i<3;i++){
+                    if(i===0){
+                        this.$refs['参考音频reverb'+i].muted = true
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = false
+                    }else{
+                        this.$refs['参考音频reverb'+i].muted = true
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }
+                }
             }
-            this.currentAudio = element.formName
+            this.reverb=0
+            this.currentAudio = element.formName+'reverb0'
+            this.currentFormAudio = element.formName
             this.$emit("onChildClick", element.formName)
         },
         clickLoop() {
@@ -191,6 +280,9 @@ export default {
             if (!this.isLoop) {
                 this.isPlaying = false
             }
+        },
+        getIsPlaying(){
+            return this.isPlaying
         }
     }
 }

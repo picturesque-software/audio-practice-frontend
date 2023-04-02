@@ -9,11 +9,11 @@
         </el-steps>
         <router-view></router-view>
         <div style="padding-top: 0.5em;">
-            <template v-if="active===0">{{stages[active]+'/64次'}}</template>
-            <template v-if="active===1">{{stages[active]+'/64次'}}</template>
-            <template v-if="active===2">{{stages[active]+'/48次'}}</template>
-            <template v-if="active===3">{{stages[active]+'/32次'}}</template>
-            <template v-if="active===4">{{stages[active]+'/32次'}}</template>
+            <template v-if="active===0">{{stages[active]+'/8次'}}</template>
+            <template v-if="active===1">{{stages[active]+'/8次'}}</template>
+            <template v-if="active===2">{{stages[active]+'/6次'}}</template>
+            <template v-if="active===3">{{stages[active]+'/4次'}}</template>
+            <template v-if="active===4">{{stages[active]+'/4次'}}</template>
         </div>
 
     </div>
