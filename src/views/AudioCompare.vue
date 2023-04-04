@@ -19,32 +19,40 @@
                 ></three-audio>
                 <el-divider></el-divider>
                 <div>
-                        <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                        <el-form :model="ruleForm0" :rules="rules" ref="ruleForm"
                                  size="mini">
-                            <div v-if="currentSelectAudio==='音频A'">
-                                <el-form-item label="音色评价" prop="lightNess1">
+                            <div v-show="currentSelectAudio0==='音频A'">
+                                <el-form-item label="音色评价" prop="quality1">
                                     <div style="width: 50%; margin-left: 30%">
                                         <el-slider
                                             @change="changeToneScore"
                                             class="slider"
-                                            v-model="ruleForm.lightNess1"
+                                            v-model="ruleForm0.quality1"
                                             :step="1"
                                             :max="2"
                                             :min="0"
                                             :marks="marks"
-                                            :format-tooltip="formatTooltipScore"
+                                            :show-tooltip="false"
                                             show-stops>
                                         </el-slider>
                                     </div>
                                 </el-form-item>
                             </div>
-                            <div v-if="currentSelectAudio==='音频B'">
-
-                                <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
-                                    <el-radio-group v-model="ruleForm.distortion2" size="mini">
-                                        <el-radio :label="1">无失真</el-radio>
-                                        <el-radio :label="0">有失真</el-radio>
-                                    </el-radio-group>
+                            <div v-show="currentSelectAudio0==='音频B'">
+                                <el-form-item label="音色评价" prop="quality2">
+                                    <div style="width: 50%; margin-left: 30%">
+                                        <el-slider
+                                            @change="changeToneScore"
+                                            class="slider"
+                                            v-model="ruleForm0.quality2"
+                                            :step="1"
+                                            :max="2"
+                                            :min="0"
+                                            :marks="marks"
+                                            :show-tooltip="false"
+                                            show-stops>
+                                        </el-slider>
+                                    </div>
                                 </el-form-item>
                             </div>
 
@@ -62,32 +70,42 @@
                 ></three-audio>
                 <el-divider></el-divider>
                 <div>
-                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                    <el-form :model="ruleForm1" :rules="rules" ref="ruleForm"
                              size="mini">
-                        <div v-if="currentSelectAudio==='音频A'">
-                            <el-form-item label="音色评价" prop="lightNess1">
+                        <div v-show="currentSelectAudio1==='音频A'">
+                            <el-form-item label="音色评价" prop="quality1">
                                 <div style="width: 50%; margin-left: 30%">
                                     <el-slider
                                         @change="changeToneScore"
                                         class="slider"
-                                        v-model="ruleForm.lightNess1"
+                                        v-model="ruleForm1.quality1"
                                         :step="1"
                                         :max="2"
                                         :min="0"
                                         :marks="marks"
                                         :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
                                         show-stops>
                                     </el-slider>
                                 </div>
                             </el-form-item>
                         </div>
-                        <div v-if="currentSelectAudio==='音频B'">
-
-                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
-                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
-                                    <el-radio :label="1">无失真</el-radio>
-                                    <el-radio :label="0">有失真</el-radio>
-                                </el-radio-group>
+                        <div v-show="currentSelectAudio1==='音频B'">
+                            <el-form-item label="音色评价" prop="quality2">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm1.quality2"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
                             </el-form-item>
                         </div>
 
@@ -105,32 +123,42 @@
                 ></three-audio>
                 <el-divider></el-divider>
                 <div>
-                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                    <el-form :model="ruleForm2" :rules="rules" ref="ruleForm"
                              size="mini">
-                        <div v-if="currentSelectAudio==='音频A'">
-                            <el-form-item label="音色评价" prop="lightNess1">
+                        <div v-show="currentSelectAudio2==='音频A'">
+                            <el-form-item label="音色评价" prop="quality1">
                                 <div style="width: 50%; margin-left: 30%">
                                     <el-slider
                                         @change="changeToneScore"
                                         class="slider"
-                                        v-model="ruleForm.lightNess1"
+                                        v-model="ruleForm2.quality1"
                                         :step="1"
                                         :max="2"
                                         :min="0"
                                         :marks="marks"
                                         :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
                                         show-stops>
                                     </el-slider>
                                 </div>
                             </el-form-item>
                         </div>
-                        <div v-if="currentSelectAudio==='音频B'">
-
-                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
-                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
-                                    <el-radio :label="1">无失真</el-radio>
-                                    <el-radio :label="0">有失真</el-radio>
-                                </el-radio-group>
+                        <div v-show="currentSelectAudio2==='音频B'">
+                            <el-form-item label="音色评价" prop="quality2">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm2.quality2"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
                             </el-form-item>
                         </div>
 
@@ -148,32 +176,42 @@
                 ></three-audio>
                 <el-divider></el-divider>
                 <div>
-                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm"
+                    <el-form :model="ruleForm3" :rules="rules" ref="ruleForm"
                              size="mini">
-                        <div v-if="currentSelectAudio==='音频A'">
-                            <el-form-item label="音色评价" prop="lightNess1">
+                        <div v-show="currentSelectAudio3==='音频A'">
+                            <el-form-item label="音色评价" prop="quality1">
                                 <div style="width: 50%; margin-left: 30%">
                                     <el-slider
                                         @change="changeToneScore"
                                         class="slider"
-                                        v-model="ruleForm.lightNess1"
+                                        v-model="ruleForm3.quality1"
                                         :step="1"
                                         :max="2"
                                         :min="0"
                                         :marks="marks"
                                         :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
                                         show-stops>
                                     </el-slider>
                                 </div>
                             </el-form-item>
                         </div>
-                        <div v-if="currentSelectAudio==='音频B'">
-
-                            <el-form-item label="失真与变调" prop="distortion2" style="flex: auto">
-                                <el-radio-group v-model="ruleForm.distortion2" size="mini">
-                                    <el-radio :label="1">无失真</el-radio>
-                                    <el-radio :label="0">有失真</el-radio>
-                                </el-radio-group>
+                        <div v-show="currentSelectAudio3==='音频B'">
+                            <el-form-item label="音色评价" prop="quality2">
+                                <div style="width: 50%; margin-left: 30%">
+                                    <el-slider
+                                        @change="changeToneScore"
+                                        class="slider"
+                                        v-model="ruleForm3.quality2"
+                                        :step="1"
+                                        :max="2"
+                                        :min="0"
+                                        :marks="marks"
+                                        :format-tooltip="formatTooltipScore"
+                                        :show-tooltip="false"
+                                        show-stops>
+                                    </el-slider>
+                                </div>
                             </el-form-item>
                         </div>
 
@@ -184,7 +222,7 @@
         </el-tabs>
 
 
-        <el-button v-if="(Number(this.stage) === 63)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
+        <el-button v-if="(Number(this.stage) === 15)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
         <el-button v-else style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
     </div>
 </template>
@@ -212,39 +250,38 @@ export default {
 
             loading:false,
 
-            currentSelectAudio:'音频A',
+            currentSelectAudio0:'音频A',
+            currentSelectAudio1:'音频A',
+            currentSelectAudio2:'音频A',
+            currentSelectAudio3:'音频A',
 
             stage: '',
 
             audios: [],
 
-            ruleForm: {
-                lightNess1: 2,
-                lightNess2: '',
-                articulation1: '',
-                articulation2: '',
-                distortion1: '',
-                distortion2: '',
+            ruleForm0: {
+                quality1:2,
+                quality2:2,
+            },
+            ruleForm1: {
+                quality1:2,
+                quality2:2,
+            },
+            ruleForm2: {
+                quality1:2,
+                quality2:2,
+            },
+            ruleForm3: {
+                quality1:2,
+                quality2:2,
             },
             rules: {
-                lightNess1: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
+                quality1: [
+                    {required: true, message: '请拖动选择合适的一项', trigger: 'blur'},
                 ],
-                articulation1: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
+                quality2: [
+                    {required: true, message: '请拖动选择合适的一项', trigger: 'blur'},
                 ],
-                distortion1: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
-                ],
-                lightNess2: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
-                ],
-                articulation2: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
-                ],
-                distortion2: [
-                    {required: true, message: '请选择你认为合适的选项', trigger: 'blur'},
-                ]
             }
         }
     },
@@ -300,45 +337,31 @@ export default {
         onNext() {
             this.$refs["ruleForm"].validate(valid => {
                 if (valid) {
-                    if(this.ruleForm.articulation1==='' || this.ruleForm.lightNess1==='' ||this.ruleForm.distortion1===''){
-                        this.$message.error("音频A还有部分未选择哦！")
-                        return;
-                    }
-                    if(this.ruleForm.articulation2==='' || this.ruleForm.lightNess2==='' ||this.ruleForm.distortion2===''){
-                        this.$message.error("音频B还有部分未选择哦！")
-                        return;
-                    }
-                    console.log(this.ruleForm)
-                    console.log(this.audios)
                     // 存排序序列，找referAudio
                     let order = []
                     let referAid;
-                    for(let i=0;i<this.audios.length;i++){
-                        order.push(this.audios[i].aid)
-                        if(this.audios[i].formName==='参考音频'){
-                            referAid = this.audios[i].aid
+                    for(let i=0;i<this.audios[this.tabIndex].length;i++){
+                        order.push(this.audios[this.tabIndex][i].aid)
+                        if(this.audios[this.tabIndex][i].formName==='参考音频'){
+                            referAid = this.audios[this.tabIndex][i].aid
                         }
                     }
                     let count=0
-                    for(let i=0;i<this.audios.length;i++){
-                        if(this.audios[i].formName==='参考音频') continue
-                        if(this.audios[i].formName==='音频A'){
-                            this.audios[i].articulation = this.ruleForm.articulation1
-                            this.audios[i].lightNess = this.ruleForm.lightNess1
-                            this.audios[i].distortion = this.ruleForm.distortion1
+                    for(let i=0;i<this.audios[this.tabIndex].length;i++){
+                        if(this.audios[this.tabIndex][i].formName==='参考音频') continue
+                        if(this.audios[this.tabIndex][i].formName==='音频A'){
+                            this.audios[this.tabIndex][i].quality = this[`${'ruleForm' + this.tabIndex}`].quality1
                         }
-                        if(this.audios[i].formName==='音频B'){
-                            this.audios[i].articulation = this.ruleForm.articulation2
-                            this.audios[i].lightNess = this.ruleForm.lightNess2
-                            this.audios[i].distortion = this.ruleForm.distortion2
+                        if(this.audios[this.tabIndex][i].formName==='音频B'){
+                            this.audios[this.tabIndex][i].quality = this[`${'ruleForm' + this.tabIndex}`].quality2
                         }
-                        this.audios[i].order = order
-                        this.audios[i].uid = Number(this.$storage.get('userid'))
-                        this.audios[i].referAid = referAid
+                        this.audios[this.tabIndex][i].order = order
+                        this.audios[this.tabIndex][i].uid = Number(this.$storage.get('userid'))
+                        this.audios[this.tabIndex][i].referAid = referAid
                         // 存入localStorage
                         let result = this.$storage.getObj('resultOfStep1')
                         result = eval(result)
-                        result[2 * Number(this.stage) + count] = this.audios[i]
+                        result[2 * Number(this.stage) + count] = this.audios[this.tabIndex][i]
                         console.log(result)
                         this.$storage.set('resultOfStep1', result)
                         count++
@@ -351,7 +374,7 @@ export default {
                     stages[step]++
                     this.$storage.set('stages', stages)
 
-                    if (Number(this.stage) === 63) {
+                    if (Number(this.stage) === 15) {
                         // 结束第一轮！
                         this.loading=true
                         let scoreList = eval(this.$storage.getObj('resultOfStep1'))
@@ -380,11 +403,12 @@ export default {
         },
         onChildUpdate(value) {
             console.log(value)
-            this.audios = value
+            this.audios[this.tabIndex] = value
+            console.log(this.audios)
         },
         onChildClick(value) {
             console.log(value)
-            if(value!=='参考音频') this.currentSelectAudio = value==='音频A'?'音频A':'音频B'
+            if(value!=='参考音频') this[`${'currentSelectAudio' + this.tabIndex}`] = value==='音频A'?'音频A':'音频B'
         }
     }
 }

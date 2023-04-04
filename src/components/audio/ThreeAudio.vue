@@ -30,15 +30,15 @@
                 </el-slider>
             </div>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb0" :src="audioList[0].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb1" :src="audioList[0].reverb1"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb2" :src="audioList[0].reverb2"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb0" :src="audioList[1].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb1" :src="audioList[1].reverb1"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb2" :src="audioList[1].reverb2"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb0" :src="audioList[2].url"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb1" :src="audioList[2].reverb1"></audio>
-        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb2" :src="audioList[2].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb0" :src="constAudios[0].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb1" :src="constAudios[0].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="参考音频reverb2" :src="constAudios[0].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb0" :src="constAudios[1].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb1" :src="constAudios[1].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb2" :src="constAudios[1].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb0" :src="constAudios[2].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb1" :src="constAudios[2].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb2" :src="constAudios[2].reverb2"></audio>
 <!--        <el-button @click="clickRefer">参考音频</el-button>-->
         <!--        </div>-->
 
@@ -120,6 +120,7 @@ export default {
                 2: '较大混响'
             },
 
+            constAudios:this.audioList,
             myAudios: this.audioList,
 
             isPlaying: false,
@@ -139,12 +140,7 @@ export default {
         }
     },
     created() {
-        // 父组件传来的audioList，0是参考音频，1,2是A，B音频
-        // this.$nextTick(() => {
-        //     this.play()
-        // })
         console.log(this.audioList)
-        console.log("tabindex:" + this.tabIndex)
     },
     methods: {
         changeReverb(val){
@@ -162,6 +158,7 @@ export default {
                             this.$refs['音频Breverb'+i].muted = true
                         }
                     }
+                    this.currentAudio = '参考音频reverb'+val
                 }else if(this.currentFormAudio==='音频A'){
                     for(let i=0;i<3;i++){
                         if(i===val){
@@ -174,6 +171,7 @@ export default {
                             this.$refs['音频Breverb'+i].muted = true
                         }
                     }
+                    this.currentAudio = '音频Areverb'+val
                 }else{
                     for(let i=0;i<3;i++){
                         if(i===val){
@@ -186,6 +184,7 @@ export default {
                             this.$refs['音频Breverb'+i].muted = true
                         }
                     }
+                    this.currentAudio = '音频Breverb'+val
                 }
             }
         },
@@ -265,6 +264,8 @@ export default {
             this.currentAudio = element.formName+'reverb0'
             this.currentFormAudio = element.formName
             this.$emit("onChildClick", element.formName)
+            console.log("after click")
+            console.log(this.currentAudio)
         },
         clickLoop() {
             this.isLoop = !this.isLoop
@@ -273,7 +274,6 @@ export default {
         onEnd() {
             let value = this.myAudios
             console.log(value)
-            console.log(this.audioList)
             this.$emit("onChildUpdate", value)
         },
         overPlay() {

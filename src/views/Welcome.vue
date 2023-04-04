@@ -95,7 +95,7 @@ export default {
                     this.$storage.set('stepActive', 0)
                     let result = JSON.parse(JSON.stringify([]))
                     console.log(result)
-                    for (let i = 0; i < audioPairList.length; i++) {
+                    for (let i = 0; i < audioPairList.length/4; i++) {
                         result.push({})
                         result.push({})
                     }
