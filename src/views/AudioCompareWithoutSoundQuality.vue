@@ -5,14 +5,47 @@
         element-loading-text="提交中"
         element-loading-spinner="el-icon-loading"
     >
-        <p>评测流程：点击播放，默认播放<span style="color:red">音频A</span>。</p>
+        <p>评测流程：默认播放<span style="color:red">音频A</span>。</p>
         <p>点击待评测音频AB方块以切换听音，并拖动方块对音频AB进行排序。<span style="color:red">注意前后~</span></p>
-        <two-audio
-            :audios="audios"
-            @update="update"
-        ></two-audio>
+        <el-tabs
+            @tab-click="changeTab"
+            :stretch="true"
+        >
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-wind-power"></i> 枪声</span>
+                <two-audio
+                    ref="thAudio0"
+                    :audios="audios[0]"
+                    @update="update"
+                ></two-audio>
+            </el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-position"></i> 脚步</span>
+                <two-audio
+                    ref="thAudio1"
+                    :audios="audios[1]"
+                    @update="update"
+                ></two-audio>
+            </el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-male"></i> 男声</span>
+                <two-audio
+                    ref="thAudio2"
+                    :audios="audios[2]"
+                    @update="update"
+                ></two-audio>
+            </el-tab-pane>
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-female"></i> 女声</span>
+                <two-audio
+                    ref="thAudio3"
+                    :audios="audios[3]"
+                    @update="update"
+                ></two-audio>
+            </el-tab-pane>
+        </el-tabs>
 
-        <el-button v-if="(Number(this.stage) === 63 && step === 1) || (Number(this.stage) === 47 && step === 2) || (Number(this.stage) === 31 && step === 3) || (Number(this.stage) === 31 && step === 4)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
+        <el-button v-if="(Number(this.stage) === 15 && step === 1) || (Number(this.stage) === 11 && step === 2) || (Number(this.stage) === 7 && step === 3) || (Number(this.stage) === 7 && step === 4)" style="margin-top: 3em" type="primary" @click="onNext">提交</el-button>
         <el-button v-else style="margin-top: 3em" type="primary" @click="onNext">下一步</el-button>
         <!--        <el-button>取消</el-button>-->
     </div>
@@ -27,6 +60,12 @@ export default {
 
     data() {
         return {
+            tabIndex:0,
+            marks:{
+                0: '差异较大',
+                1: '有一定偏差',
+                2: '与参考相近'
+            },
             loading:false,
             step: '',
             stage: '',
@@ -43,9 +82,9 @@ export default {
         console.log(this.stage)
         let audioPairList = this.$storage.getObj('audioPairList')
         if (step < 3) {
-            console.log(audioPairList[this.stage])
-            // stage 0-1 2-3 4-5
-            this.audios = audioPairList[this.stage].audioList
+            for(let i=0;i<4;i++){
+                this.audios.push(audioPairList[this.stage*4+i].audioList)
+            }
         } else if(step === 3){
             // 冒泡比较
             if (this.stage % 2 === 0) {
@@ -57,7 +96,8 @@ export default {
                 this.audios.push(audioPairList[(this.stage - 1)/2].audioList[1])
                 this.audios.push(audioPairList[(this.stage - 1)/2].audioList[2])
             }
-        }else{
+        }
+        else{
             //0(0) 1(1) 2(0) 3(1) 4(2) 5(3)  28(14) 29(15) 30(14) 31(15)
             if(this.stage%4<2){
                 if(this.stage % 2 === 0){
@@ -74,28 +114,44 @@ export default {
             }
             this.audios = audioPairList[this.pairIndex].audioList
         }
-        this.audios[0].formName = '音频A'
-        this.audios[1].formName = '音频B'
+        for(let i=0;i<4;i++){
+            this.audios[i][0].formName = '音频A'
+            this.audios[i][1].formName = '音频B'
+        }
+        console.log(this.audios)
+        this.$nextTick(() => {
+            this.$refs.thAudio0.play()
+        })
     },
     mounted() {
 
     },
 
     methods: {
+        changeTab(tab){
+            if(this.$refs["thAudio"+this.tabIndex].getIsPlaying()) {
+                // 如果原tab在放，则停一下
+                this.$refs["thAudio"+this.tabIndex].play()
+            }
+
+            this.tabIndex=Number(tab.index)
+            this.$refs["thAudio"+this.tabIndex].play()
+            console.log("dad" + tab.index)
+        },
         onNext() {
             if (this.step < 3) {
                 // 存排序序列
                 let order = []
-                for (let i = 0; i < this.audios.length; i++) {
-                    order.push(this.audios[i].aid)
+                for (let i = 0; i < this.audios[this.tabIndex].length; i++) {
+                    order.push(this.audios[this.tabIndex][i].aid)
                 }
-                for (let i = 0; i < this.audios.length; i++) {
-                    this.audios[i].order = order
-                    this.audios[i].uid = Number(this.$storage.get('userid'))
+                for (let i = 0; i < this.audios[this.tabIndex].length; i++) {
+                    this.audios[this.tabIndex][i].order = order
+                    this.audios[this.tabIndex][i].uid = Number(this.$storage.get('userid'))
                     // 存入localStorage
                     let result = this.$storage.getObj('resultOfStep1')
                     result = eval(result)
-                    result[2 * Number(this.stage) + i] = this.audios[i]
+                    result[2 * Number(this.stage) + i] = this.audios[this.tabIndex][i]
                     console.log(result)
                     this.$storage.set('resultOfStep1', result)
                 }
@@ -140,7 +196,7 @@ export default {
             stages[step]++
             this.$storage.set('stages', stages)
 
-            if (Number(this.stage) === 63 && step === 1) {
+            if (Number(this.stage) === 15 && step === 1) {
                 // 结束第2轮！
                 this.loading=true
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
@@ -162,7 +218,8 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) === 47 && step === 2) {
+            }
+            else if (Number(this.stage) === 11 && step === 2) {
                 // 结束第3轮！
                 this.loading=true
                 let scoreList = eval(this.$storage.getObj('resultOfStep1'))
@@ -184,7 +241,8 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) === 31 && step === 3) {
+            }
+            else if (Number(this.stage) === 7 && step === 3) {
                 // 结束第4轮！
                 this.loading=true
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
@@ -209,7 +267,8 @@ export default {
                     }
                 });
                 return;
-            } else if (Number(this.stage) === 31 && step === 4) {
+            }
+            else if (Number(this.stage) === 7 && step === 4) {
                 // 结束第5轮！
                 this.loading=true
                 let audioPairList = eval(this.$storage.getObj('audioPairList'))
@@ -239,7 +298,7 @@ export default {
         },
         update(value) {
             console.log(value)
-            this.audios = value
+            this.audios[this.tabIndex] = value
         },
         updateAudioPairList() {
             console.log(this.$storage.getObj('audioPairList')[this.stage % 2 === 0 ? this.stage : this.stage - 1])

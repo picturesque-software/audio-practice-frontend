@@ -237,11 +237,6 @@ export default {
     data() {
         return {
             tabIndex:0,
-            marksReverb:{
-                0: '未处理',
-                1: '轻微混响',
-                2: '较大混响'
-            },
             marks:{
                 0: '差异较大',
                 1: '有一定偏差',

@@ -12,17 +12,38 @@
                 暂停
             </el-button>
         </div>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio1" ref="音频A" :src="urls[0]"></audio>
-        <audio @ended="overPlay" :loop="isLoop" :muted="isMutedAudio2" ref="音频B" :src="urls[1]"></audio>
-        <!--        </div>-->
+        <div style="display: flex">
+            <div style="margin: auto;width: 50%">
+                <span>混响调节</span>
+                <el-slider
+                    @change="changeReverb"
+                    class="slider"
+                    v-model="reverb"
+                    :step="1"
+                    :max="2"
+                    :min="0"
+                    :marks="marksReverb"
+                    :format-tooltip="formatTooltipReverb"
+                    :show-tooltip="false"
+                    show-stops>
+                </el-slider>
+            </div>
+        </div>
 
-        <div style="display: flex;margin-top: 1em">
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb0" :src="constAudios[0].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb1" :src="constAudios[0].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Areverb2" :src="constAudios[0].reverb2"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb0" :src="constAudios[1].url"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb1" :src="constAudios[1].reverb1"></audio>
+        <audio @ended="overPlay" :loop="isLoop" ref="音频Breverb2" :src="constAudios[1].reverb2"></audio>
+
+        <div style="display: flex;margin-top: 2em; height: 8em">
             <div style="width: 10%; color: #e74c3c">前</div>
             <draggable style="width: 80%" @end="onEnd" v-model="myAudios" chosen-class="chosen" force-fallback="true"
                        fallbackTolerance="3" group="material" animation="1000">
                 <transition-group style="height: 7em; display: flex">
                     <template v-for="(element, index) in myAudios">
-                        <drag-item @itemClick="clickAudio(element)" :class="currentAudio === element.formName ? 'activeItem':'item'" :key="element.name" :index="index"
+                        <drag-item @itemClick="clickAudio(element)" :class="currentFormAudio === element.formName ? 'activeItem':'item'" :key="element.name" :index="index"
                                    :audio="element">
                         </drag-item>
                     </template>
@@ -48,59 +69,119 @@ export default {
     },
     data() {
         return {
+            reverb: 0,
+            marksReverb:{
+                0: '未处理',
+                1: '轻微混响',
+                2: '较大混响'
+            },
             myAudios: this.audios,
+            constAudios:this.audios,
 
             isPlaying: false,
 
-            audioRefs: ['音频A', '音频B'],
+            audioRefs: ['音频Areverb0', '音频Areverb1', '音频Areverb2', '音频Breverb0', '音频Breverb1', '音频Breverb2'],
 
-            currentAudio: '音频A',
-
-            isMutedAudio1: true,
-            isMutedAudio2: false,
+            currentAudio: '音频Areverb0',
+            currentFormAudio:'音频A',
 
             isLoop: true,
 
-            urls:[]
         }
+    },
+    created() {
+      console.log(this.audios)
     },
     mounted() {
-        console.log(this.myAudios)
-        for(let i=0;i<this.audios.length;i++){
-            this.urls.push(this.audios[i].url)
-        }
-        // this.play()
+
     },
     methods: {
+        changeReverb(val){
+            if(! (this.currentAudio.at(this.currentAudio.length-1) === val.toString()) ){
+                console.log(val)
+                if(this.currentFormAudio==='音频A'){
+                    for(let i=0;i<3;i++){
+                        if(i===val){
+                            this.$refs['音频Areverb'+i].muted = false
+                            this.$refs['音频Breverb'+i].muted = true
+                        }else{
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }
+                    }
+                    this.currentAudio = '音频Areverb'+val
+                }else{
+                    for(let i=0;i<3;i++){
+                        if(i===val){
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = false
+                        }else{
+                            this.$refs['音频Areverb'+i].muted = true
+                            this.$refs['音频Breverb'+i].muted = true
+                        }
+                    }
+                    this.currentAudio = '音频Breverb'+val
+                }
+            }
+        },
+        formatTooltipReverb(val){
+            if(val===0){
+                return '未处理'
+            }else if(val===1){
+                return  '轻微混响'
+            }else{
+                return '较大混响'
+            }
+        },
         play() {
-            if (this.$refs['音频A'].paused && this.$refs['音频B'].paused) {
+            if (!this.isPlaying) {
                 for (let i = 0; i < this.audioRefs.length; i++) {
                     if (this.audioRefs[i] === this.currentAudio) continue
                     this.$refs[this.audioRefs[i]].muted = true
                 }
 
-                this.$refs['音频A'].play()
-                this.$refs['音频B'].play()
+                for(let i = 0;i < 3; i++){
+                    this.$refs['音频Areverb'+i].play()
+                    this.$refs['音频Breverb'+i].play()
+                }
 
                 this.isPlaying = true
             } else {
-                this.$refs['音频A'].pause()
-                this.$refs['音频B'].pause()
+                for(let i = 0;i < 3; i++){
+                    this.$refs['音频Areverb'+i].pause()
+                    this.$refs['音频Breverb'+i].pause()
+                }
 
                 this.isPlaying = false
             }
         },
         clickAudio(element) {
-            if (element.formName==='音频A') {
-                this.$refs['音频A'].muted = false
-                this.$refs['音频B'].muted = true
-                this.currentAudio = "音频A"
-            } else {
-                this.$refs['音频A'].muted = true
-                this.$refs['音频B'].muted = false
-                this.currentAudio = "音频B"
+            if(element.formName === "音频A"){
+                for(let i=0;i<3;i++){
+                    if(i===0){
+                        this.$refs['音频Areverb'+i].muted = false
+                        this.$refs['音频Breverb'+i].muted = true
+                    }else{
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }
+                }
+            } else if(element.formName === "音频B"){
+                for(let i=0;i<3;i++){
+                    if(i===0){
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = false
+                    }else{
+                        this.$refs['音频Areverb'+i].muted = true
+                        this.$refs['音频Breverb'+i].muted = true
+                    }
+                }
             }
-            this.$emit("onChildClick", element.formName)
+            this.reverb=0
+            this.currentAudio = element.formName+'reverb0'
+            this.currentFormAudio = element.formName
+            console.log("after click")
+            console.log(this.currentAudio)
         },
         clickLoop() {
             this.isLoop = !this.isLoop
@@ -114,6 +195,9 @@ export default {
             if (!this.isLoop) {
                 this.isPlaying = false
             }
+        },
+        getIsPlaying(){
+            return this.isPlaying
         }
     }
 }
@@ -159,5 +243,9 @@ export default {
 input, textarea {
     user-select: text;
     -webkit-user-select: text;
+}
+.slider{
+    /* fix slider last Chinese mark not breaking properly */
+    word-break: keep-all;
 }
 </style>

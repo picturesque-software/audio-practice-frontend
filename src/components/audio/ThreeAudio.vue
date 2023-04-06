@@ -130,10 +130,6 @@ export default {
             currentAudio: '参考音频reverb0',
             currentFormAudio:'参考音频',
 
-            isMutedRefer: true,
-            isMutedAudio1: true,
-            isMutedAudio2: false,
-
             isLoop: true,
 
             urls:[]
