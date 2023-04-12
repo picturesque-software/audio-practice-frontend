@@ -10,7 +10,7 @@
         <!-- 内容区域 -->
         <!-- <img src="../assets/src=http___p4.itc.cn_q_70_images01_20210506_628477c0733b44ac898ed640b2e473c1.jpeg&refer=http___p4.itc.webp" alt class="tupian-img" /> -->
         <div style="margin: 3em">
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="auto" :label-position="labelPosition" size="mini">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="4em" :label-position="labelPosition" size="mini" :hide-required-asterisk="true">
                 <el-form-item label="用户名" prop="username" class="white-label-item">
                     <el-input type="text" v-model="ruleForm.username"></el-input>
                 </el-form-item>
@@ -118,7 +118,7 @@ export default {
     height: 40%;
 }
 .jianbian {
-    height: 1000px;
+    height: 850px;
     width: 100%;
     /* margin: 0;
               padding: 0; */

@@ -128,7 +128,7 @@ h1 {
     width: 100%;
 }
 .jianbian {
-    height: 1000px;
+    height: 850px;
     width: 100%;
     /* margin: 0;
               padding: 0; */
